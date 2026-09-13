@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url>
+<loc>https://i2tools.com</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://i2tools.com/explore</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/explore" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/explore" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/explore" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/explore</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/explore" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/explore" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/explore" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/explore</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/explore" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/explore" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/explore" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/explore</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/explore" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/explore" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/explore" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/explore" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://i2tools.com/tools</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/tools</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/tools</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/tools</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/tutorials</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tutorials" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tutorials" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/tutorials</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tutorials" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tutorials" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/tutorials</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tutorials" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tutorials" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/tutorials</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tutorials" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tutorials" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tutorials" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tutorials" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://i2tools.com/tools/ai-pixel-art</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/ai-pixel-art" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/tools/ai-pixel-art</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/ai-pixel-art" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/tools/ai-pixel-art</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/ai-pixel-art" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/tools/ai-pixel-art</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/ai-pixel-art" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/ai-pixel-art" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/tools/perfect-pixel</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/perfect-pixel" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/tools/perfect-pixel</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/perfect-pixel" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/tools/perfect-pixel</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/perfect-pixel" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/tools/perfect-pixel</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/perfect-pixel" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/perfect-pixel" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/tools/xhs-media</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/xhs-media" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/tools/xhs-media</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/xhs-media" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/tools/xhs-media</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/xhs-media" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/tools/xhs-media</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/tools/xhs-media" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/tools/xhs-media" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/announcements</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/announcements" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/announcements" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/announcements" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/announcements</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/announcements" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/announcements" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/announcements" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/announcements</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/announcements" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/announcements" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/announcements" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/announcements</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/announcements" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/announcements" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/announcements" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/announcements" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.6</priority>
+</url>
+<url>
+<loc>https://i2tools.com/about</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/about" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/about" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/about" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/about</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/about" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/about" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/about" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/about</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/about" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/about" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/about" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/about</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/about" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/about" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/about" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/about" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://i2tools.com/contact</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/contact" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/contact" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/contact" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/contact</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/contact" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/contact" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/contact" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/contact</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/contact" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/contact" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/contact" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/contact</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/contact" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/contact" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/contact" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/contact" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
+</url>
+<url>
+<loc>https://i2tools.com/privacy</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/privacy" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/privacy" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/privacy</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/privacy" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/privacy" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/privacy</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/privacy" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/privacy" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/privacy</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/privacy" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/privacy" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/privacy" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/terms</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/terms" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/terms" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/terms" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/terms</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/terms" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/terms" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/terms" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/terms</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/terms" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/terms" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/terms" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/terms</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/terms" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/terms" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/terms" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/terms" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/disclaimer</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/disclaimer" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/disclaimer" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/en/disclaimer</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/disclaimer" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/disclaimer" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/ja/disclaimer</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/disclaimer" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/disclaimer" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+<loc>https://i2tools.com/zh-Hant/disclaimer</loc>
+<xhtml:link rel="alternate" hreflang="x-default" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh" href="https://i2tools.com/disclaimer" />
+<xhtml:link rel="alternate" hreflang="en" href="https://i2tools.com/en/disclaimer" />
+<xhtml:link rel="alternate" hreflang="ja" href="https://i2tools.com/ja/disclaimer" />
+<xhtml:link rel="alternate" hreflang="zh-Hant" href="https://i2tools.com/zh-Hant/disclaimer" />
+<lastmod>2026-09-13T09:08:39.485Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.3</priority>
+</url>
+</urlset>
