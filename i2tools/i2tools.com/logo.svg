@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Cyan Gradient -->
+    <linearGradient id="grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ED5F6" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Pink Gradient -->
+    <linearGradient id="grad-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D8B" />
+      <stop offset="100%" stop-color="#E11D48" />
+    </linearGradient>
+
+    <!-- Purple Gradient -->
+    <linearGradient id="grad-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9D73FF" />
+      <stop offset="100%" stop-color="#7224EE" />
+    </linearGradient>
+
+    <!-- Amber (Magic) Gradient -->
+    <linearGradient id="grad-amber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Base Ring Shape (Perler Bead) -->
+    <!-- R=85, r=40 (Thickness=45) -->
+    <path id="ring" d="M 0 -85 A 85 85 0 1 1 0 85 A 85 85 0 1 1 0 -85 M 0 -40 A 40 40 0 1 0 0 40 A 40 40 0 1 0 0 -40 Z" fill-rule="evenodd" />
+
+    <!-- Magic Sparkle Shape -->
+    <!-- Extends to exactly R=85 to match perfectly with the Rings -->
+    <path id="sparkle" d="M 0 -85 Q 26 -26 85 0 Q 26 26 0 85 Q -26 26 -85 0 Q -26 -26 0 -85 Z" fill-rule="evenodd" />
+  </defs>
+
+  <!-- Rhombus / Diamond Jewel Matrix -->
+  <!-- 120.21 unit spacing strictly guarantees perfect point-to-point locking on 45-degree diagonal axes -->
+  <g transform="translate(256, 256)">
+    <!-- Top: The Guiding Magic Sparkle -->
+    <use href="#sparkle" x="0" y="-120.21" fill="url(#grad-amber)" />
+    
+    <!-- Left: Base Supporting Ring -->
+    <use href="#ring" x="-120.21" y="0" fill="url(#grad-cyan)" />
+    
+    <!-- Right: Base Supporting Ring -->
+    <use href="#ring" x="120.21" y="0" fill="url(#grad-pink)" />
+    
+    <!-- Bottom: Base Foundation Ring -->
+    <use href="#ring" x="0" y="120.21" fill="url(#grad-purple)" />
+  </g>
+</svg>
