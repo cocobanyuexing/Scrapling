@@ -198,20 +198,30 @@ return Math.sqrt((512+s)*d*d/256 + 4*c*c + (767-s)*u*u/256);
 - **Average**：均值色
 - **PixelArtOptimized**：像素画优化（默认）
 
-### 4.3 perfect-pixel 伪像素画修正算法
+### 4.3 perfect-pixel 伪像素画修正算法（v3 修正）
 
-来源：独立 chunk，借鉴开源思路 TS 重写。
+来源：chunk `1720`（`to.aS` 函数）
+
+> v3 修正：原"边界扫描→量化→重采样"为推测，**已用 chunk 1720 `to.aS` 函数签名 + 6 个参数实测替换**。
 
 流程：
 1. 输入像素画结果图
-2. 边界扫描识别"半像素"边缘
-3. 量化到整数像素网格
-4. 重采样匹配 MARD 调色板
-5. 输出对齐后的修正 canvas
+2. 调用 `to.aS(imageSource, gridDimensions, projectName, pixelLayerName, referenceLayerName)`（Web Worker 异步执行）
+   - `sampleMethod: "center"`
+   - `gridSize: null`
+   - `minSize: 4`
+   - `peakWidth: 6`
+   - `refineIntensity: .25`
+   - `fixSquare: !0`
+3. 输出对齐后的修正 canvas
+
+> D 类（待接手者验证）：`to.aS` 函数体内部"边界扫描→量化→重采样"的具体卷积/迭代实现未反编译。
 
 ### 4.4 去噪/杂色处理算法（核心）
 
 来源：chunk `6777-710cc5ad9e725047.js`
+
+> v3 修正：8 连通扫描方法已确认为**经典 BFS 队列扩散**（`q.shift()+q.push()`），`test_denoise_apply_v3.py` 实测色号 49→45 真实执行。
 
 #### 4.4.1 4 种预设强度
 
@@ -224,32 +234,37 @@ let i = {
 };
 ```
 
-#### 4.4.2 8 连通域分析（BFS 标记）
+#### 4.4.2 8 连通域分析（经典 BFS 队列扩散）
 
 ```js
 // 4 连通：[[-1,0],[1,0],[0,-1],[0,1]]
 // 8 连通：[[-1,-1],[-1,1],[1,-1],[1,1]] 补充
 let u = e => 4===e ? d : c;  // 4 or 8
 
-// BFS 标记同色像素为同一区域
+// 经典 BFS 队列扩散（q.shift()+q.push()）+ new Uint8Array 标记矩阵
 function g(e, t=8) {
   let r = u(t), n = Array.from({length:e.length}, () => new Uint8Array(e[0].length));
   for (let row=0; row<e.length; row++) {
     for (let col=0; col<e[0].length; col++) {
       if (n[row][col]) continue;
-      // BFS 扩散，同色并入
+      // BFS 队列扩散，同色并入
       let q=[{row,col}];
       while (q.length) {
-        let p = q.shift();
+        let p = q.shift();  // ⭐ 经典 BFS 出队
         for (let [dr,dc] of r) {
           let nr=p.row+dr, nc=p.col+dc;
-          if (same_color(e[nr][nc], e[p.row][p.col])) q.push({row:nr, col:nc});
+          if (!n[nr][nc] && same_color(e[nr][nc], e[p.row][p.col])) {
+            n[nr][nc] = 1;
+            q.push({row:nr, col:nc});  // ⭐ 经典 BFS 入队
+          }
         }
       }
     }
   }
 }
 ```
+
+> 实测证据：`test_denoise_apply_v3.py` 点击「确认」应用后，色号数 49 → 45（真实执行，非仅 UI 弹窗）。
 
 #### 4.4.3 面积阈值过滤
 
@@ -263,23 +278,47 @@ function g(e, t=8) {
 
 含义：杂色区域与主体像素的接触比例，过低才删除（保护线条）。
 
-### 4.5 拼图图纸识别算法
+### 4.5 拼图图纸识别算法（v3 修正）
 
-来源：chunk `1720`
+来源：chunk `3107`
 
-流程：
-1. 图纸上传 → 边缘检测（Canny/Sobel）
-2. 矢量化 → 提取色块边界
-3. 颜色识别 → 匹配 MARD 色号
-4. 网格重建 → 生成项目 layers
+> v3 修正：原"Canny/Sobel 边缘检测 + 矢量化"为推测，**chunk 3107 实际是 `MardCnn="mard-cnn"` 卷积神经网络，3 阶段：Cropping → Segmenting → Review + GridAlign/Verification**。
 
-### 4.6 库存扣减算法
+实测证据：`si15.log` v15 真实触发识别流程，XHR 日志**无任何识别相关请求**（无 pattern/recognize/mard-cnn），证明是浏览器本地推理。
 
-来源：chunk `9350`
+> D 类（待接手者验证）：MARD-CNN 模型权重张量与 CNN 网络结构未反编译。
 
-- 色号合并：相同色号多项目用量累加
-- 扣减：依据项目 `colorCounts` 减库存数量
-- 低库存预警：`< 阈值` 触发提醒（默认 10）
+### 4.6 库存扣减算法（v3 修正）
+
+来源：chunk `3244` + `inv_v14.log` 实测
+
+> v3 修正：原"色号合并 → 扣减 → 低库存预警"为推测，**已用 chunk 3244 反编译 + v14 真实测试替换**。
+
+**API 端点（反编译 + 实测验证）**：
+
+| 方法 | 路径 | 用途 |
+|:---:|:---|:---|
+| GET  | `/v1/app/inventory/summary` | 库存汇总（totalQuantity / trackedColorCount / inStockColorCount / lowStockCount / defaultWarningThreshold=10 / defaultAdjustQuantity=100） |
+| GET  | `/v1/app/inventory/colors?pageIndex=1&pageSize=2000` | 色号列表（items 数组：`{brandCode,colorCode,quantity,hex}`） |
+| POST | `/v1/app/inventory/operations` | 手动调整（actionType=`manual_adjust`，items 数组） |
+| POST | `/v1/app/inventory/operations/{id}/rollback` | 回滚指定操作（id 必须为 numeric string） |
+| POST | `/v1/app/inventory/operations/project-consume` | 项目消耗库存（snapshotTitle+colorSystem+materialsCompact+remark?） |
+
+**v14 实测流程**（`inv_v14.log`，9 步全部 status=201）：
+
+| 步骤 | 操作 | 结果 |
+|:---:|:---|:---|
+| 1 | `POST /operations` H1 +10 | opId=29854，H1 0→10 |
+| 2 | `POST /operations/29854/rollback` | 反向 op（H1 -10），H1 10→0 |
+| 3 | `POST /operations` H1 -3 | opId=29856，H1 0→**−3**（允许负数） |
+| 4 | `POST /operations/29856/rollback` | 反向 op（H1 +3），H1 −3→0 |
+| 5 | `POST /operations/project-consume` H1:1,H2:2 | opId=29858，H1 −1 / H2 −2 |
+
+**v3 修正 4 处错误推测**：
+- ❌ 字段名 `operationType` → ✅ 实际 `actionType`（枚举 manual_adjust/project_consume/import/rollback）
+- ❌ 色号格式 "H01" → ✅ 实际 "H1"（不带 0）
+- ❌ 回滚 = 软删除原 op → ✅ 实际创建反向 operation（`actionType=rollback`，`rollbackOfId` 指向原 op，`direction` 相反，`changeQty` 取反）
+- ❌ 库存为负会阻断 → ✅ 实测 H1 -3 也成功，**不强制非负校验**
 
 ---
 

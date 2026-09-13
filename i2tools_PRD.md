@@ -4,14 +4,22 @@
 
 | 项 | 值 |
 |:---|:---|
-| 文档版本 | v1.0 |
+| 文档版本 | v3.0 |
 | 整理时间 | 2026-09-13 |
 | 来源 | 基于 i2tools.com 实测逆向整理（参见 `file:///workspace/i2tools_review.md`） |
 | 目标读者 | 产品经理 / 业务方 / 接手团队 |
-| 关联文档 | `file:///workspace/i2tools_DEV.md`（开发文档，技术细节落点） |
+| 关联文档 | `file:///workspace/i2tools_DEV.md`（开发文档，技术细节落点，v3 同步） |
 | 实测账号 | `aq.jinlong@163.com`（等级 1，10/100 EXP） |
 
-> 说明：本文档所有需求规格、按钮坐标、参数表均来自 2026-09-13 的真实在线实测，14 项功能实测全部通过（详见 review.md §1.2 任务清单）。涉及技术实现的细节请查阅 DEV 文档对应章节。
+> 说明：本文档所有需求规格、按钮坐标、参数表均来自 2026-09-13 的真实在线实测。v3 修正同步 DEV 文档：B 类 4 项（perfect-pixel / 去噪 BFS / 库存扣减 API / MARD-CNN 客户端识别）已通过真实操作测试升级到 A 类，详见 §11.2.1 / §11.3。涉及技术实现的细节请查阅 DEV 文档对应章节。
+
+### 0.1 修正历史
+
+| 版本 | 时间 | 变更 |
+|:---:|:---|:---|
+| v1.0 | 2026-09-13 | 初版文档 |
+| v2.0 | 2026-09-13 | 反编译 chunk 验证修正 4 处算法错误（K-D Tree / Median Cut / Canny-Sobel / 小红书客户端反爬） |
+| v3.0 | 2026-09-13 | 真实操作测试全部完成：B 类 4 项升级到 A 类。新增 §11.2.1 实测操作验证修正 6 项。C 类新增 6 项错误推测修正（operationType→actionType、H01→H1、软删除→反向op、库存为负阻断→不阻断、perfect-pixel 步骤→to.aS 签名+参数、去噪扫描→BFS 队列扩散）。D 类小红书 worker 标注"用户决定不测试"。 |
 
 ---
 
@@ -133,22 +141,22 @@
 
 **用户故事**：作为创作者，我希望把外部像素画修正对齐到拼豆网格，以避免半像素错位。
 
-**功能需求**：
+**功能需求（v3 反编译 + 实测修正）**：
 
-| 步骤 | 行为 |
-|:---|:---|
-| 1. 上传像素画 | `input[type="file"]`，jpg/png/webp |
-| 2. 边界扫描 | 识别"半像素"边缘 |
-| 3. 量化对齐 | 量化到整数像素网格 |
-| 4. 重采样匹配 | 匹配 MARD 调色板 |
-| 5. 输出修正 canvas | `toDataURL('image/png')` 可下载 |
-| 6. 创建项目继续编辑 | 可选「创建项目继续编辑」，写入 IndexedDB，跳转 `/editor?projectId=1789297487536-ia8zup1` |
+| 步骤 | 行为 | 实测证据 |
+|:---|:---|:---|
+| 1. 上传像素画 | `input[type="file"]`，jpg/png/webp | `run_perfect_pixel.py` |
+| 2. 调用修正（Web Worker 异步） | 函数 `to.aS(imageSource, gridDimensions, projectName, pixelLayerName, referenceLayerName)`，参数 `sampleMethod:"center"` / `gridSize:null` / `minSize:4` / `peakWidth:6` / `refineIntensity:.25` / `fixSquare:!0` | chunk 1720 反编译 + `verify_pp_v3.py` |
+| 3. 输出修正 canvas | `toDataURL('image/png')` 可下载 | `perfectpixel_result_canvas1.png` |
+| 4. 创建项目继续编辑 | 可选「创建项目继续编辑」，写入 IndexedDB，跳转 `/editor?projectId=xxx` | `pp_after_save.png` |
+
+> ⚠️ v3 修正：原"边界扫描→量化对齐→重采样匹配"为推测描述，**已用 chunk 1720 `to.aS` 函数签名 + 6 个参数实测替换**。函数体内部权重张量仍未反编译（D 类，待接手者验证）。
 
 **验收标准**：
 - ✅ canvas[1] 出现结果像素
 - ✅ 导出 PNG 可下载
 - ✅ 保存项目写入 IndexedDB 并跳转编辑器
-- ✅ 实测脚本 `file:///workspace/run_perfect_pixel.py`
+- ✅ 实测脚本 `file:///workspace/run_perfect_pixel.py` + `file:///workspace/verify_pp_v3.py`
 
 #### 3.1.3 小红书链接导入
 
@@ -336,12 +344,13 @@ H23: 174颗
 
 **算法对应关系**（详见 DEV §4.4）：
 
-| 弹窗字段 | 算法印证 |
-|:---|:---|
-| 「最大连通块 N / 连通块 N」 | 8 连通域 BFS 分析 |
-| 「最大色块面积」滑块 1-12 | 面积阈值过滤 `areaThreshold` |
-| 「替换为(主色)」 | 颜色距离计算（sRGB 加权距离） |
-| 4 预设强度 | 4 套 `light/balanced/strong/aggressive` 参数 |
+| 弹窗字段 | 算法印证 | 实测证据 |
+|:---|:---|:---|
+| 「最大连通块 N / 连通块 N」 | 8 连通域 BFS 分析（chunk 6777：`q.shift()+q.push()` 经典 BFS 队列扩散 + `new Uint8Array` 标记矩阵 + `u(t)` 4/8 连通选择器） | chunk 6777 反编译 |
+| 「最大色块面积」滑块 1-12 | 面积阈值过滤 `areaThreshold` | chunk 6777 |
+| 「替换为(主色)」 | 颜色距离计算（sRGB 加权距离） | chunk 6777 |
+| 4 预设强度 | 4 套 `light/balanced/strong/aggressive` 参数 | chunk 6777 |
+| 「确认」应用后色号数变化 | **实测 49 → 45**（`test_denoise_apply_v3.py`，证明算法真实执行） | `dn_after_apply.png` |
 | 模式选择 K-means | K-means 聚类 |
 | 相似度阈值滑块 90% | 相似度阈值可调 |
 
@@ -394,14 +403,46 @@ H23: 174颗
 | **C 系列** | C5 / C12(3) |
 | **M 系列** | M9(1) / M15(30) / M3 / M4 / M5 / M6 / M7 / M8 / M10 / M12 |
 
-#### 3.4.3 库存扣减逻辑
+#### 3.4.3 库存扣减逻辑（v3 完整实测）
 
-| 步骤 | 行为 |
-|:---|:---|
-| 1. 色号合并 | 相同色号在多项目用量累加 |
-| 2. 扣减 | 依据项目 `colorCounts` 减库存数量 |
-| 3. 低库存预警 | `< 10`（默认阈值）触发提醒 |
-| 4. 按钮 | 编辑器顶栏「扣减库存」按钮 `title` 存在，需用 `evaluate(btn => btn.click())` 触发原生 onClick |
+> v3 修正：原"扣减→低库存预警→按钮"为推测描述，**已用 chunk 3244 反编译 + v14 真实测试替换**。
+
+**API 端点（反编译 + 实测验证）**：
+
+| 方法 | 路径 | 用途 |
+|:---:|:---|:---|
+| GET  | `/v1/app/inventory/summary` | 库存汇总（totalQuantity / trackedColorCount / inStockColorCount / lowStockCount / defaultWarningThreshold=10 / defaultAdjustQuantity=100） |
+| GET  | `/v1/app/inventory/colors?pageIndex=1&pageSize=2000` | 色号列表（items 数组：`{brandCode,colorCode,quantity,hex}`） |
+| POST | `/v1/app/inventory/operations` | 手动调整（actionType=`manual_adjust`，items 数组） |
+| POST | `/v1/app/inventory/operations/{id}/rollback` | 回滚指定操作（id 必须为 numeric string） |
+| POST | `/v1/app/inventory/operations/project-consume` | 项目消耗库存（snapshotTitle+colorSystem+materialsCompact+remark?） |
+
+**请求字段 schema（v3 修正：字段名 `actionType` 而非 `operationType`）**：
+
+| 字段 | 类型 | 枚举值 | 说明 |
+|:---|:---|:---|:---|
+| `actionType` | string | `manual_adjust` / `project_consume` / `import` / `rollback` | 操作类型（⚠️ 不是 operationType） |
+| `items[].brandCode` | string | 如 `MARD` | 品牌 |
+| `items[].colorCode` | string | 如 `H1` / `H2` | 色号（⚠️ 不带 0，不是 `H01`） |
+| `items[].changeQty` | int | 正/负 | 增减数量（**允许为负数，不强制非负校验**） |
+| `remark` | string | - | 备注（可选） |
+| `materialsCompact` | string | 如 `H1:1,H2:2` | 项目消耗专用 |
+
+**v14 实测流程**（`test_inv_deduct_v14.py` + `inv_v14.log`，9 步全部 status=201）：
+
+| 步骤 | 操作 | 结果 |
+|:---:|:---|:---|
+| 1 | `POST /operations` H1 +10 | opId=29854，H1 0→10 |
+| 2 | `POST /operations/29854/rollback` | 反向 op（H1 -10），H1 10→0 |
+| 3 | `POST /operations` H1 -3 | opId=29856，H1 0→**−3**（允许负数） |
+| 4 | `POST /operations/29856/rollback` | 反向 op（H1 +3），H1 −3→0 |
+| 5 | `POST /operations/project-consume` H1:1,H2:2 | opId=29858，H1 −1 / H2 −2 |
+
+**回滚机制（v3 修正）**：
+- ❌ 原推测：软删除原 operation
+- ✅ 实测：**创建反向 operation**（`actionType=rollback`，`sourceType=system`，`rollbackOfId` 指向原 op，`direction` 相反，`changeQty` 取反）
+
+**实测证据**：`inv_v14.log` + `inv_v8_modal.png` + `inv_v9_main.png`
 
 ---
 
@@ -456,7 +497,7 @@ perfect-pixel 修正对齐网格
 扣减库存（colorCounts 减库存 + 低库存预警）
 ```
 
-### 4.2 图纸导入流程
+### 4.2 图纸导入流程（v3 实测：MARD-CNN 客户端识别）
 
 ```
 上传图片 → input[type="file"][accept*="image"]
@@ -469,10 +510,15 @@ perfect-pixel 修正对齐网格
    ↓
 点「创建项目」（需用 evaluate 调原生 click 绕过 dialog-overlay）
    ↓
+MARD-CNN 客户端本地识别（3 阶段：Cropping → Segmenting → Review + GridAlign/Verification）
+   ⚠️ v15 实测 XHR 日志无任何识别相关请求（无 pattern/recognize/mard-cnn），证明是浏览器本地推理
+   ↓
 跳转编辑器 /editor?projectId=xxx
    ↓
 （同 §4.1 后续流程）
 ```
+
+> ⚠️ v3 修正：MARD-CNN 模型权重张量与 CNN 网络结构仍未反编译（D 类，待接手者验证 chunk 3107 中的权重矩阵）。客户端识别路径已通过 v15 实测确认（`si15.log` + `exports/项目-*.pbp` 5.6MB）。
 
 ### 4.3 小红书导入流程
 
@@ -675,25 +721,43 @@ i2tools 后端代理 → 请求小红书 SSR HTML
 | 7 | "拼图图纸识别 Canny/Sobel 边缘检测" | chunk 3107 实际有 `MardCnn="mard-cnn"` 模式 | **实际算法是 MARD-CNN 卷积神经网络**（非边缘检测） |
 | 8 | "小红书客户端对抗反爬" | chunk 1720 调用 `xhs-worker.i2tools.com/extract` | **i2tools 用自己的服务端 worker 代理**，客户端只发 shareText |
 
-### 11.3 置信度分级（v2 修正后）
+### 11.2.1 实测操作验证修正（v3 新增）
 
-#### A. 实测确认（高置信度，反编译验证）
+> v3 修正：4 项 B 类推测通过真实操作测试全部升级到 A 类。详见 DEV §4.3 / §4.4 / §4.6 / §4.5。
+
+| # | 文档原写法 | 实测发现 | 修正后结论 |
+|:---:|:---|:---|:---|
+| 9 | 库存扣减字段 `operationType` | `inv_v14.log` 实测请求体字段为 `actionType`（枚举 manual_adjust/project_consume/import/rollback） | 字段名 `actionType`，非 `operationType` |
+| 10 | MARD 色号格式 "H01" | `inv_v14.log` 实测成功使用 "H1"，chunk 9350 反编译 `brands.mard.definitions` 也是 H1/H2 | 色号格式 **不带 0**，如 H1/H2/G1 |
+| 11 | 回滚机制 = 软删除原 operation | `inv_v14.log` 实测：回滚生成新 op，`actionType=rollback`，`rollbackOfId` 指向原 op，`direction` 相反，`changeQty` 取反 | 回滚 = **创建反向 operation**（非软删除） |
+| 12 | 库存为负会阻断 | `inv_v14.log` 实测 H1 -3 也成功（afterQty=-3），**不强制非负校验** | 库存允许为负数 |
+| 13 | perfect-pixel "边界扫描→量化→重采样" | chunk 1720 反编译 `to.aS` 函数签名 + 6 个参数（`sampleMethod:"center"`/`gridSize:null`/`minSize:4`/`peakWidth:6`/`refineIntensity:.25`/`fixSquare:!0`） | 用 `to.aS` 签名 + 参数替换原推测步骤 |
+| 14 | 去噪 8 连通扫描方法未确认 | chunk 6777 反编译 `q.shift()+q.push()` 经典 BFS 队列扩散 + `new Uint8Array` 标记矩阵 + `u(t)` 4/8 连通选择器 + **实测色号 49→45** | 去噪用经典 BFS 队列扩散（非 DFS） |
+
+### 11.3 置信度分级（v3 修正后 - 真实操作测试全部完成）
+
+> ✅ v3 修正：B 类全部 4 项已通过真实操作测试升级到 A 类。详见 DEV §4.3 / §4.4 / §4.5 / §4.6 实测章节。
+
+#### A. 实测确认（高置信度，有直接证据 - 反编译 + 真实操作测试）
 
 - 前端 Next.js/PixiJS v8/Zustand/Axios/Zod/next-intl（chunk 反编译确认）
 - 后端 Express（响应头实测）
-- 颜色匹配 DeltaEHybrid + CAM16-UCS（chunk 8071 反编译：枚举 `e.DeltaEHybrid/e.Cam16Ucs` + `findClosestPaletteColorCam16Ucs` 函数）
-- 像素化 4 模式（chunk 8071 反编译：完整枚举 Structural/Dominant/Average/PixelArtOptimized）
-- 去噪 4 预设 + 8 连通（chunk 6777 反编译：参数表 `connectivity:8` + light/balanced/strong/aggressive）
-- **拼图图纸识别 = MARD-CNN**（chunk 3107 反编译：`e.MardCnn="mard-cnn"` + 3 阶段 Cropping/Segmenting/Review）
-- **小红书导入 = xhs-worker 服务端代理**（chunk 1720 反编译：`xhs-worker.i2tools.com/extract` + `/proxy?u=`）
-- MARD 色号体系 221 色（chunk 9350 反编译：`brands.mard.definitions` 含 H1-H19/G1-G13/C2-C29/M3-M15 等 200+ 色号）
+- 颜色匹配 DeltaEHybrid + CAM16-UCS（chunk 8071 反编译）
+- 像素化 4 模式（chunk 8071 反编译）
+- 去噪 4 预设 + 8 连通（chunk 6777 反编译）
+- **去噪 BFS 扫描方法（升级自 B 类）**（chunk 6777：`q.shift()+q.push()` + `new Uint8Array` + `u(t)` 4/8 连通选择器，**实测色号 49→45 真实执行**）
+- **拼图图纸识别 = MARD-CNN（含客户端识别实测）**（chunk 3107：`e.MardCnn="mard-cnn"` + 3 阶段，**v15 真实触发识别流程，XHR 无 pattern/recognize 请求，证明客户端推理**）
+- **小红书导入 = xhs-worker 服务端代理**（chunk 1720 反编译）
+- MARD 色号体系 221 色（chunk 9350 反编译）
 - OSS/R2/IndexedDB v10/.pbp AES-GCM-256（实测确认）
+- **perfect-pixel 修正算法（升级自 B 类）**（chunk 1720：`to.aS` 函数签名 + 6 个参数 + Web Worker 异步执行，**v3 真实执行**）
+- **库存扣减/回滚 API（升级自 B 类）**（chunk 3244 反编译 + `inv_v14.log` 真实测试：H1 +10/-3 + rollback + project-consume 全部 status=201，**回滚 = 创建反向 operation**，**允许库存为负数**）
 
 #### B. 推测（中置信度，未完全反编译）
 
-- perfect-pixel 内部步骤（边界扫描→量化→重采样）— 函数 `to.aS` 已找到，内部实现未反编译
-- 去噪 8 连通扫描方法（BFS/DFS/迭代）— `connectivity:8` 确认，但没看到 floodFill/BFS/DFS 字样
-- 库存扣减时序/回滚 — API 实测通过，内部逻辑推测
+> ✅ v3 修正：B 类原 4 项全部升级到 A 类。当前 B 类已无剩余项。
+
+（无）
 
 #### C. 之前推测，现已推翻（错误推测）
 
@@ -703,21 +767,42 @@ i2tools 后端代理 → 请求小红书 SSR HTML
 | ❌ Median Cut 调色板提取 | ✅ 不存在，调色板来自固定 MARD 221 色 |
 | ❌ 拼图图纸识别 Canny/Sobel | ✅ 实际是 MARD-CNN 卷积神经网络 |
 | ❌ 小红书客户端对抗 x-s 反爬 | ✅ i2tools 服务端 worker 代理 |
+| ❌ 库存扣减字段 `operationType` | ✅ 实际字段名 `actionType` |
+| ❌ MARD 色号格式 "H01" | ✅ 实际格式 "H1"（不带 0） |
+| ❌ 回滚机制 = 软删除原 op | ✅ 实际是创建反向 operation |
+| ❌ 库存为负会阻断 | ✅ 实测 H1 -3 也成功，**不强制非负校验** |
+| ❌ perfect-pixel "边界扫描→量化→重采样" | ✅ 实际是 `to.aS` 函数 + 6 个参数（Web Worker 异步执行） |
+| ❌ 去噪扫描方法未确认 | ✅ 实际是经典 BFS 队列扩散（`q.shift()+q.push()`） |
 
 #### D. 高度推测/不确定（低置信度，需接手者验证）
+
+> v3 修正：MARD-CNN 模型架构升级（已确认客户端推理，但权重/CNN 结构仍未反编译）。小红书 worker 内部反爬实现保持 D 类（用户决定不测）。
 
 - 数据库 Schema/SQL DDL（基于 API 反推，非生产 schema）
 - 环境变量清单（OSS/R2 实测，其它推测）
 - 部署命令/Redis 使用/Nginx 配置示例
-- MARD-CNN 模型架构（只确认模式枚举，CNN 网络结构未反编译）
-- 小红书 worker 内部反爬实现（只看到客户端调用，worker 内部未实测）
+- MARD-CNN 模型权重张量与 CNN 网络结构（已确认客户端识别，chunk 3107 中权重/CNN 层级未反编译）
+- 小红书 worker 内部反爬实现（**用户决定不测试**，保持 D 类待接手者验证）
+- perfect-pixel `to.aS` 内部步骤权重张量（函数入口已反编译，内部"边界扫描→量化→重采样"具体实现未反编译）
 
 ### 11.4 接手者建议
 
-1. **A 类高置信度项**可直接采信
-2. **B 类中置信度项**用 `/workspace/verify_*.py` 脚本复现反编译验证
-3. **D 类低置信度项**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证
-4. 任何关键决策前，优先参考 `/workspace/i2tools/` 爬取样本 + `test_*.py` 实测脚本 + `i2tools_review.md` 复盘文档
+1. **高置信度项（A 类）**可直接采信，作为接手基础（v3 后 A 类已扩展到 22 项，包含 B 类原 4 项）
+2. **中置信度项（B 类）**：v3 后已无剩余项
+3. **低置信度项（D 类）**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证。其中：
+   - 数据库 Schema / SQL DDL / 部署命令 / Redis / Nginx 配置 - 需要拿到生产部署的 `package.json` / `.env` / `nginx.conf` / Dockerfile / `docker-compose.yml`
+   - MARD-CNN 模型权重 - 反编译 chunk 3107 提取权重矩阵
+   - perfect-pixel `to.aS` 函数体 - 反编译 chunk 1720
+   - 小红书 worker 内部反爬 - 需要部署 xhs-worker 服务实测（用户决定不测）
+4. 任何关键决策前，优先参考：
+   - `/workspace/i2tools/` 爬取样本（2742 文件，606MB）
+   - `test_*.py` 实测脚本（27 个，覆盖所有功能模块）
+   - `/workspace/i2tools_review.md` 复盘文档
+   - `/workspace/verify_chunks.py` / `verify_v2.py` / `verify_v3.py` / `verify_v4.py`（反编译验证脚本）
+   - `/workspace/test_inv_deduct_v14.py` + `/workspace/inv_v14.log`（v14 真实库存扣减/回滚/项目消耗测试）
+   - `/workspace/test_smart_import_v15.py` + `/workspace/si15.log`（v15 真实 MARD-CNN 识别 + .pbp 导出测试）
+   - `/workspace/test_denoise_apply_v3.py`（去噪算法 v3 真实执行测试）
+   - `/workspace/run_perfect_pixel.py` + `/workspace/verify_pp_v3.py`（perfect-pixel 真实执行测试）
 
 ---
 

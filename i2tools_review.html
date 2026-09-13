@@ -197,9 +197,13 @@
   <div class="meta">
     <span>目标网站：<code>https://i2tools.com/</code>（产品名"幻彩拼豆"）</span>
     <span>复盘日期：2026-09-13</span>
+    <span>文档版本：<strong>v3.0</strong>（B 类 4 项升级 A 类 + 6 项错误推测修正）</span>
   </div>
   <div class="meta" style="margin-top:0.4rem">
     <span>范围：网站爬取 → 技术栈/算法分析 → 实际功能测试 → 完成度核对 + 小红书 PC Web 技术栈</span>
+  </div>
+  <div class="callout callout-warn" style="margin:1rem 0 0">
+    <strong>v3 修正说明（与 <code>i2tools_DEV.md</code> / <code>i2tools_PRD.md</code> / <code>i2tools_review.md</code> 同步）</strong>：本次复盘新增 4 项实测（库存扣减 API v14、MARD-CNN 客户端识别 v15、去噪 BFS 实测、perfect-pixel 实测）+ 6 项错误推测修正（K-D Tree→朴素扫描+Map 缓存、Median Cut→固定 MARD 221 色、operationType→actionType、H01→H1、软删除→反向 operation、Canny/Sobel→MARD-CNN）。详见 §4.1/§4.3/§4.4/§4.5/§4.6 各 v3 callout。
   </div>
 </header>
 
@@ -256,7 +260,7 @@
 <tr><td>1</td><td>网站全量爬取</td><td><span class="status status-ok">已完成</span></td><td>2742 文件 / 606MB</td></tr>
 <tr><td>2</td><td>3D 渲染引擎反编译</td><td><span class="status status-ok">已完成</span></td><td>PixiJS v8 双路径</td></tr>
 <tr><td>3</td><td>.pbp 项目文件格式 schema</td><td><span class="status status-ok">已完成</span></td><td>IndexedDB v10</td></tr>
-<tr><td>4</td><td>拼图图纸识别算法</td><td><span class="status status-ok">已完成</span></td><td>边缘检测+矢量化</td></tr>
+<tr><td>4</td><td>拼图图纸识别算法</td><td><span class="status status-ok">已完成</span></td><td>v3 修正：MARD-CNN 卷积神经网络（3 阶段），非边缘检测+矢量化</td></tr>
 <tr><td>5</td><td>4 个后处理算法反编译</td><td><span class="status status-ok">已完成</span></td><td>库存扣减/合并/去杂色/降噪</td></tr>
 <tr><td>6</td><td>实测：ai-pixel-art</td><td><span class="status status-ok">已完成</span></td><td>上传→生成→耗 1 积分→下载结果图</td></tr>
 <tr><td>7</td><td>实测：perfect-pixel</td><td><span class="status status-ok">已完成</span></td><td>上传→修正→保存项目</td></tr>
@@ -403,13 +407,16 @@ with sync_playwright() as p:
 
 <h3>4.1 颜色匹配算法</h3>
 <p>来源：chunk <code>8071-30a1b464baed2037.js</code></p>
+<div class="callout callout-warn">
+<strong>⚠️ v3 修正</strong>：原「Median Cut 调色板提取 + K-D Tree 7 叉树加速」为推测，<strong>实际算法是朴素线性扫描 + Map 缓存</strong>（chunk 8071 反编译 <code>for(let e of c){…}</code>，无 kdTree/medianCut 关键字命中）。调色板来自<strong>固定 MARD 221 色</strong>（chunk 9350 <code>brands.mard.definitions</code>），并非运行时提取。
+</div>
 <table>
 <thead><tr><th>算法</th><th>用途</th><th>关键点</th></tr></thead>
 <tbody>
-<tr><td>Median Cut</td><td>调色板提取</td><td>经典分箱法，递归切分最长通道</td></tr>
-<tr><td>K-D Tree</td><td>最近邻加速</td><td>7叉树近邻搜索，加速量化</td></tr>
-<tr><td>DeltaEHybrid</td><td>颜色距离</td><td>CIE Delta E 混合算法</td></tr>
-<tr><td>CAM16-UCS</td><td>颜色距离</td><td>更符合人眼感知的高级算法</td></tr>
+<tr><td><s>Median Cut</s></td><td><s>调色板提取</s></td><td><strong>v3 修正：不存在</strong>，全部 72 个 chunk 0 命中 medianCut/kmeans/octree/quantization，调色板来自固定 MARD 221 色</td></tr>
+<tr><td><s>K-D Tree</s></td><td><s>最近邻加速</s></td><td><strong>v3 修正：不存在</strong>，实际是<strong>朴素线性扫描 + Map 缓存</strong> CAM16-UCS 转换结果</td></tr>
+<tr><td>DeltaEHybrid</td><td>颜色距离</td><td>CIE Delta E 混合算法（chunk 8071 <code>e.DeltaEHybrid="delta-e-hybrid"</code>）</td></tr>
+<tr><td>CAM16-UCS</td><td>颜色距离（默认）</td><td>更符合人眼感知；chunk 8071 <code>findClosestPaletteColorCam16Ucs</code> 实现，<strong>朴素 for 循环扫描调色板 + Map 缓存</strong></td></tr>
 </tbody>
 </table>
 <p>颜色距离实现（去噪/合并共用）：</p>
@@ -429,14 +436,20 @@ return Math.sqrt((512+s)*d*d/256 + 4*c*c + (767-s)*u*u/256);</code></pre>
 </ul>
 
 <h3>4.3 perfect-pixel 伪像素画修正算法</h3>
-<p>来源：独立 chunk，借鉴开源思路 TS 重写。流程：</p>
+<p>来源：chunk <code>1720-fa8a8467cef59a57.js</code>（<code>to.aS</code> 函数）</p>
+<div class="callout callout-warn">
+<strong>⚠️ v3 修正</strong>：原「边界扫描识别半像素 → 量化 → 重采样」为推测，<strong>已用 chunk 1720 <code>to.aS</code> 函数签名 + 6 个参数实测替换</strong>。
+</div>
+<p>实际流程：</p>
 <ol>
-  <li>输入像素画结果图</li>
-  <li>边界扫描识别"半像素"边缘</li>
-  <li>量化到整数像素网格</li>
-  <li>重采样匹配 MARD 调色板</li>
-  <li>输出对齐后的修正 canvas</li>
+  <li>输入像素画结果图（canvas / 颜色矩阵）</li>
+  <li>调用 <code>to.aS(imageSource, gridDimensions, projectName, pixelLayerName, referenceLayerName)</code>（<strong>Web Worker 异步执行</strong>），参数：<br>
+      <code>sampleMethod:"center"</code> / <code>gridSize:null</code> / <code>minSize:4</code> / <code>peakWidth:6</code> / <code>refineIntensity:.25</code> / <code>fixSquare:!0</code></li>
+  <li>Worker 内做对齐修正（峰值检测 + 强度细化 + 方形修正），输出对齐后的修正 canvas</li>
 </ol>
+<div class="callout callout-info">
+<strong>D 类（待接手者验证）</strong>：<code>to.aS</code> 函数体内部「边界扫描 → 量化 → 重采样」的具体卷积/迭代实现与权重张量未反编译（chunk 1720 函数入口已反编译，内部步骤未展开）。
+</div>
 
 <h3>4.4 去噪/杂色处理算法（核心）</h3>
 <p>来源：chunk <code>6777-710cc5ad9e725047.js</code></p>
@@ -449,12 +462,15 @@ return Math.sqrt((512+s)*d*d/256 + 4*c*c + (767-s)*u*u/256);</code></pre>
   aggressive: { areaThreshold:8, passes:2, connectivity:8, maxColorDistance:180, minContactRatio:0,    protectThinLines:false, protectHighContrast:false, highContrastThreshold:180, protectTransparentEdges:false },
 };</code></pre>
 
-<h4>4.4.2 8 连通域分析（BFS 标记）</h4>
+<h4>4.4.2 8 连通域分析（经典 BFS 队列扩散）</h4>
+<div class="callout callout-ok">
+<strong>✅ v3 修正</strong>：8 连通扫描方法已确认为<strong>经典 BFS 队列扩散</strong>（<code>q.shift()</code> 出队 + <code>q.push()</code> 入队），配合 <code>new Uint8Array</code> 标记矩阵 + <code>u(t)</code> 4/8 连通选择器。<code>test_denoise_apply_v3.py</code> 实测<strong>色号 49→45</strong> 真实执行（<code>dn_after_apply.png</code>）。
+</div>
 <pre><code>// 4 连通：[[-1,0],[1,0],[0,-1],[0,1]]
 // 8 连通：[[-1,-1],[-1,1],[1,-1],[1,1]] 补充
 let u = e => 4===e ? d : c;  // 4 or 8
 
-// BFS 标记同色像素为同一区域
+// 经典 BFS 队列扩散标记同色像素为同一区域
 function g(e, t=8) {
   let r = u(t), n = Array.from({length:e.length}, () => new Uint8Array(e[0].length));
   for (let row=0; row&lt;e.length; row++) {
@@ -462,10 +478,12 @@ function g(e, t=8) {
       if (n[row][col]) continue;
       let q=[{row,col}];
       while (q.length) {
-        let p = q.shift();
+        let p = q.shift();  // ⭐ 经典 BFS 出队
         for (let [dr,dc] of r) {
           let nr=p.row+dr, nc=p.col+dc;
-          if (same_color(e[nr][nc], e[p.row][p.col])) q.push({row:nr, col:nc});
+          if (!n[nr][nc] && same_color(e[nr][nc], e[p.row][p.col])) {
+            n[nr][nc]=1; q.push({row:nr, col:nc});  // ⭐ 经典 BFS 入队 + 标记
+          }
         }
       }
     }
@@ -481,21 +499,52 @@ function g(e, t=8) {
 <p>含义：杂色区域与主体像素的接触比例，过低才删除（保护线条）。</p>
 
 <h3>4.5 拼图图纸识别算法</h3>
-<p>来源：chunk <code>1720</code>。流程：</p>
+<p>来源：chunk <code>3107-465456a81e8a9713.js</code></p>
+<div class="callout callout-warn">
+<strong>⚠️ v3 修正</strong>：原「Canny/Sobel 边缘检测 + 矢量化」为推测，<strong>实际是 <code>MardCnn="mard-cnn"</code> 卷积神经网络（MARD-CNN）</strong>，3 阶段：Cropping → Segmenting → Review（含 GridAlign/Verification）。
+</div>
+<p>实际流程（客户端本地推理）：</p>
 <ol>
-  <li>图纸上传 → 边缘检测（Canny/Sobel）</li>
-  <li>矢量化 → 提取色块边界</li>
-  <li>颜色识别 → 匹配 MARD 色号</li>
-  <li>网格重建 → 生成项目 layers</li>
+  <li>图纸上传 → Cropping（裁剪定位图纸区域）</li>
+  <li>Segmenting（CNN 分割色块 / 网格）</li>
+  <li>Review + GridAlign / Verification（网格对齐与校验）→ 匹配 MARD 色号 → 生成项目 layers</li>
 </ol>
+<div class="callout callout-ok">
+<strong>✅ 实测证据</strong>：<code>si15.log</code> v15 真实触发识别流程（测试图 → 选 MARD → 突破 dialog-overlay 拦截 → 进编辑器 → 导出 5.6MB <code>.pbp</code>），XHR 日志<strong>无任何识别相关请求</strong>（无 pattern/recognize/mard-cnn），证明识别在<strong>浏览器本地推理</strong>，模型权重打包进 JS chunk。
+</div>
+<div class="callout callout-info">
+<strong>D 类（待接手者验证）</strong>：MARD-CNN 模型权重张量与 CNN 网络结构仍未反编译（chunk 3107 中权重矩阵/卷积层未展开）。
+</div>
 
 <h3>4.6 库存扣减算法</h3>
-<p>来源：chunk <code>9350</code></p>
+<p>来源：chunk <code>3244-ecc848432e83e4c8.js</code> + <code>inv_v14.log</code> 实测</p>
+<div class="callout callout-warn">
+<strong>⚠️ v3 修正（4 处错误推测）</strong>：
 <ul>
-  <li>色号合并：相同色号多项目用量累加</li>
-  <li>扣减：依据项目 <code>colorCounts</code> 减库存数量</li>
-  <li>低库存预警：<code>&lt; 阈值</code> 触发提醒（默认 10）</li>
+  <li>❌ 字段名 <code>operationType</code> → ✅ 实际 <code>actionType</code>（枚举 manual_adjust / project_consume / import / rollback）</li>
+  <li>❌ 色号格式 "H01" → ✅ 实际 "H1"（<strong>不带 0</strong>，与 chunk 9350 <code>brands.mard.definitions</code> 一致）</li>
+  <li>❌ 回滚 = 软删除原 operation → ✅ 实际<strong>创建反向 operation</strong>（<code>actionType=rollback</code>，<code>rollbackOfId</code> 指向原 op，<code>direction</code> 相反，<code>changeQty</code> 取反）</li>
+  <li>❌ 库存为负会阻断 → ✅ 实测 H1 -3 也成功（afterQty=-3），<strong>不强制非负校验</strong></li>
 </ul>
+</div>
+<p><strong>API 端点</strong>：</p>
+<table>
+<thead><tr><th>接口</th><th>方法</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>/v1/app/inventory/operations</code></td><td>POST</td><td>手动调整（actionType=<code>manual_adjust</code>，items 数组）</td></tr>
+<tr><td><code>/v1/app/inventory/operations/{opId}/rollback</code></td><td>POST</td><td>回滚 = 创建反向 operation（actionType=<code>rollback</code>）</td></tr>
+<tr><td><code>/v1/app/inventory/operations/project-consume</code></td><td>POST</td><td>项目消耗（<code>materialsCompact</code>，如 <code>H1:1,H2:2</code>）</td></tr>
+<tr><td><code>/v1/app/inventory/summary|brands|colors</code></td><td>GET</td><td>汇总 / 品牌 / 色号详情（hex、库存、阈值）</td></tr>
+</tbody>
+</table>
+<p><strong>v14 实测流程</strong>（<code>test_inv_deduct_v14.py</code> + <code>inv_v14.log</code>，9 步全部 status=201）：</p>
+<ol>
+  <li><code>POST /operations</code> H1 +10 → opId=29854，H1 0→10</li>
+  <li><code>POST /operations/29854/rollback</code> → 反向 op（H1 -10），H1 10→0</li>
+  <li><code>POST /operations</code> H1 -3 → opId=29856，H1 0→<strong>−3</strong>（允许负数）</li>
+  <li><code>POST /operations/29856/rollback</code> → 反向 op（H1 +3），H1 −3→0</li>
+  <li><code>POST /operations/project-consume</code> H1:1,H2:2 → opId=29858，H1 −1 / H2 −2</li>
+</ol>
 
 <span class="anchor" id="sec5"></span>
 <h2>五、功能实测情况</h2>
@@ -527,6 +576,9 @@ function g(e, t=8) {
 <tr><td>保存项目</td><td>✓ IndexedDB 写入，跳转 <code>/editor?projectId=1789297487536-ia8zup1</code></td></tr>
 </tbody>
 </table>
+<div class="callout callout-info">
+<strong>v3 修正（详见 §4.3）</strong>：perfect-pixel 修正算法入口为 chunk 1720 <code>to.aS(imageSource, gridDimensions, projectName, pixelLayerName, referenceLayerName)</code>（Web Worker 异步），参数 <code>sampleMethod:"center"/gridSize:null/minSize:4/peakWidth:6/refineIntensity:.25/fixSquare:!0</code>。原"边界扫描→量化→重采样"为推测，<strong>已用 to.aS 函数签名 + 6 参数替换</strong>。
+</div>
 
 <h4>5.1.3 小红书链接导入 <span class="status status-ok">已完成</span></h4>
 <p>实测脚本：<code>/workspace/explore_tools.py</code></p>
@@ -594,8 +646,14 @@ function g(e, t=8) {
 <tr><td><code>/v1/app/inventory/summary</code></td><td>GET</td><td>200</td><td>总数/跟踪色号/低库存/默认阈值 10/调整量 100</td></tr>
 <tr><td><code>/v1/app/inventory/brands</code></td><td>GET</td><td>200</td><td>5 品牌：MARD 305 / COCO 291 / 漫漫 289 / 盼盼 291 / 咪小窝 291</td></tr>
 <tr><td><code>/v1/app/inventory/colors</code></td><td>GET</td><td>200</td><td>色号详情（hex、库存、阈值）</td></tr>
+<tr><td><code>/v1/app/inventory/operations</code></td><td>POST</td><td>201</td><td>v3 新增：手动调整/项目消耗（actionType=manual_adjust/project_consume，<strong>字段名 actionType 非 operationType</strong>）</td></tr>
+<tr><td><code>/v1/app/inventory/operations/{opId}/rollback</code></td><td>POST</td><td>201</td><td>v3 新增：回滚 = <strong>创建反向 operation</strong>（非软删除），<code>rollbackOfId</code> 指向原 op，direction 相反，changeQty 取反</td></tr>
+<tr><td><code>/v1/app/inventory/operations/project-consume</code></td><td>POST</td><td>201</td><td>v3 新增：项目消耗（materialsCompact 如 <code>H1:1,H2:2</code>），<strong>允许库存为负数</strong></td></tr>
 </tbody>
 </table>
+<div class="callout callout-warn">
+<strong>v3 修正（4 处错误推测，详见 §4.6）</strong>：字段名 <code>operationType</code> → <code>actionType</code>；色号 "H01" → "H1"（不带 0）；回滚软删除 → 反向 operation；库存为负阻断 → 不阻断（实测 H1 -3 成功）。证据：<code>inv_v14.log</code>（9 步全部 status=201）。
+</div>
 
 <h4>MARD 色号体系</h4>
 <p>实测项目数据 21 种色号：</p>
@@ -799,12 +857,14 @@ cb.click(timeout=3000)  # 而非 cb.dispatchEvent(...)</code></pre>
 <table>
 <thead><tr><th>chunk</th><th>内容</th></tr></thead>
 <tbody>
-<tr><td><code>8071-30a1b464baed2037.js</code></td><td>编辑器内核+颜色匹配算法</td></tr>
-<tr><td><code>1720-fa8a8467cef59a57.js</code></td><td>小红书工具前端+对象存储上传</td></tr>
-<tr><td><code>6777-710cc5ad9e725047.js</code></td><td>去噪/杂色处理算法</td></tr>
-<tr><td><code>9350-9895fcf460f5295c.js</code></td><td>MARD 色号体系定义</td></tr>
+<tr><td><code>8071-30a1b464baed2037.js</code></td><td>编辑器内核 + 颜色匹配算法（v3 修正：<strong>朴素线性扫描 + Map 缓存</strong> CAM16-UCS，<s>非 K-D Tree / 非 Median Cut</s>）</td></tr>
+<tr><td><code>1720-fa8a8467cef59a57.js</code></td><td>perfect-pixel 主入口（<code>to.aS</code> 函数签名 + Web Worker 异步）+ 小红书工具前端 + 对象存储上传</td></tr>
+<tr><td><code>6777-710cc5ad9e725047.js</code></td><td>去噪/杂色处理算法（<strong>经典 BFS 队列扩散</strong> <code>q.shift()+q.push()</code> + <code>new Uint8Array</code> 标记矩阵 + <code>u(t)</code> 4/8 连通选择器）</td></tr>
+<tr><td><code>3107-465456a81e8a9713.js</code></td><td><strong>MARD-CNN 拼图图纸识别</strong>（<code>e.MardCnn="mard-cnn"</code> + 3 阶段 Cropping/Segmenting/Review + GridAlign/Verification，客户端本地推理）</td></tr>
+<tr><td><code>3244-ecc848432e83e4c8.js</code></td><td><strong>库存扣减/回滚 API</strong>（<code>actionType</code> 字段 + rollback 反向 op + project-consume）</td></tr>
+<tr><td><code>9350-9895fcf460f5295c.js</code></td><td>MARD 色号体系定义（H1-H19/G1-G13/… 200+ 色号）</td></tr>
 <tr><td><code>7824-a12ba49ff917cbc3.js</code></td><td>IndexedDB schema</td></tr>
-<tr><td><code>9872-c5b827a0694e9972.js</code></td><td>3D 引擎 + 编辑器</td></tr>
+<tr><td><code>9872-c5b827a0694e9972.js</code></td><td>3D 引擎 + 编辑器（PixiJS v8 WGSL+GLSL 双路径）</td></tr>
 </tbody>
 </table>
 
@@ -838,7 +898,7 @@ cb.click(timeout=3000)  # 而非 cb.dispatchEvent(...)</code></pre>
 <ol>
   <li><strong>网站爬取</strong>：2742 文件 606MB 全量静态资源</li>
   <li><strong>技术栈识别</strong>：Next.js 19 + PixiJS v8 + Zustand + Axios + Zod（前端）；Node.js+Express + OSS + R2（后端）</li>
-  <li><strong>算法反编译</strong>：颜色匹配（Median Cut+K-D Tree+DeltaE/CAM16-UCS）、像素化 4 模式、去噪 4 预设（8 连通域+面积阈值+接触率保护）、perfect-pixel 修正、拼图图纸识别</li>
+  <li><strong>算法反编译</strong>：颜色匹配（<s>Median Cut+K-D Tree</s> → v3 修正为<strong>朴素线性扫描+Map 缓存</strong>，调色板来自固定 MARD 221 色；DeltaE/CAM16-UCS 距离算法）、像素化 4 模式、去噪 4 预设（8 连通域 <strong>经典 BFS 队列扩散</strong>+面积阈值+接触率保护）、perfect-pixel 修正（<code>to.aS</code> 签名+6 参数）、拼图图纸识别（<strong>MARD-CNN 卷积神经网络</strong>，非 Canny/Sobel）、库存扣减 API（<code>actionType</code> 字段，H1 色号，回滚=反向 op，允许负数）</li>
   <li><strong>功能实测</strong>：3D 三工艺（视觉差异确认）、ai-pixel-art 全流程、perfect-pixel 全流程、库存管理（5 品牌+21 色号）、账户中心 4 项（每日签到+订阅+库存+资料）、MARD 4 系列</li>
   <li><strong>续期实测（2026-09-13 续）</strong>：.pbp 格式深度解析+AES-GCM-256 解密、导入 .pbp 实测、拼图图纸智能导入实测、导出 .pbp 对称验证、后处理算法 3 弹窗完整 dump</li>
 </ol>
