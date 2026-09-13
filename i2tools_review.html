@@ -257,7 +257,7 @@
 <table>
 <thead><tr><th>#</th><th>任务</th><th>状态</th><th>备注</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>网站全量爬取</td><td><span class="status status-ok">已完成</span></td><td>2742 文件 / 606MB</td></tr>
+<tr><td>1</td><td>网站全量爬取</td><td><span class="status status-ok">已完成</span></td><td>2742 文件 / 606MB 磁盘占用（压缩包 ≈414MB）</td></tr>
 <tr><td>2</td><td>3D 渲染引擎反编译</td><td><span class="status status-ok">已完成</span></td><td>PixiJS v8 双路径</td></tr>
 <tr><td>3</td><td>.pbp 项目文件格式 schema</td><td><span class="status status-ok">已完成</span></td><td>IndexedDB v10</td></tr>
 <tr><td>4</td><td>拼图图纸识别算法</td><td><span class="status status-ok">已完成</span></td><td>v3 修正：MARD-CNN 卷积神经网络（3 阶段），非边缘检测+矢量化</td></tr>
@@ -325,7 +325,7 @@ with sync_playwright() as p:
 
 <h3>2.3 爬取成果</h3>
 <ul>
-  <li><strong>总大小</strong>：606 MB</li>
+  <li><strong>总大小</strong>：606 MB（磁盘占用口径，<code>du -sh</code>；纯文件 ≈594MB，下载压缩包 ≈414MB）</li>
   <li><strong>文件数</strong>：2742 个</li>
   <li><strong>关键产物</strong>：
     <ul>
@@ -336,6 +336,14 @@ with sync_playwright() as p:
     </ul>
   </li>
 </ul>
+
+<div class="callout callout-info">
+<strong>大小口径说明（606M vs 414M）</strong>：解压后的 <code>i2tools/</code> 外层含 3 个子目录（<code>i2tools.com/</code> 网站主体 + <code>gallery-images/</code> 作品库图片 + <code>oss-cdn.i2tools.com/</code> CDN 壳），三者合计：<br>
+&nbsp;&nbsp;• 磁盘占用（<code>du -sh</code>）= <strong>606 MB</strong>（含 4K 块对齐与目录元数据，本文档采用此口径）<br>
+&nbsp;&nbsp;• 纯文件字节合计（<code>find -printf '%s'</code>）= <strong>≈ 594 MB</strong>（567 MiB）<br>
+&nbsp;&nbsp;• 下载到的<strong>压缩包</strong>（gzip/tar 压缩后）= <strong>≈ 414 MB</strong>（纯文本 / 静态资源压缩率约 30%）<br>
+因此 <strong>解压前 414M（压缩包）/ 解压后 606M（磁盘占用）都是正常的</strong>，资料完整无缺。OSS 实际拿到部分真实 <code>.webp</code>，R2 <code>r2-uploads</code> 仅为目录壳（详见 DEV §12.3 缺口 #5）。
+</div>
 
 <h3>2.4 反爬应对策略</h3>
 <table>
@@ -896,7 +904,7 @@ cb.click(timeout=3000)  # 而非 cb.dispatchEvent(...)</code></pre>
 <h3>10.1 已达成</h3>
 <div class="callout callout-ok">
 <ol>
-  <li><strong>网站爬取</strong>：2742 文件 606MB 全量静态资源</li>
+  <li><strong>网站爬取</strong>：2742 文件 606MB（磁盘占用；压缩包 ≈414MB）全量静态资源</li>
   <li><strong>技术栈识别</strong>：Next.js 19 + PixiJS v8 + Zustand + Axios + Zod（前端）；Node.js+Express + OSS + R2（后端）</li>
   <li><strong>算法反编译</strong>：颜色匹配（<s>Median Cut+K-D Tree</s> → v3 修正为<strong>朴素线性扫描+Map 缓存</strong>，调色板来自固定 MARD 221 色；DeltaE/CAM16-UCS 距离算法）、像素化 4 模式、去噪 4 预设（8 连通域 <strong>经典 BFS 队列扩散</strong>+面积阈值+接触率保护）、perfect-pixel 修正（<code>to.aS</code> 签名+6 参数）、拼图图纸识别（<strong>MARD-CNN 卷积神经网络</strong>，非 Canny/Sobel）、库存扣减 API（<code>actionType</code> 字段，H1 色号，回滚=反向 op，允许负数）</li>
   <li><strong>功能实测</strong>：3D 三工艺（视觉差异确认）、ai-pixel-art 全流程、perfect-pixel 全流程、库存管理（5 品牌+21 色号）、账户中心 4 项（每日签到+订阅+库存+资料）、MARD 4 系列</li>

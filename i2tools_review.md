@@ -21,7 +21,7 @@
 
 | # | 任务 | 状态 | 备注 |
 |:---:|:---|:---:|:---|
-| 1 | 网站全量爬取 | ✅ | 2742 文件 / 606MB |
+| 1 | 网站全量爬取 | ✅ | 2742 文件 / 606MB 磁盘占用（压缩包 ≈414MB） |
 | 2 | 3D 渲染引擎反编译 | ✅ | PixiJS v8 双路径 |
 | 3 | .pbp 项目文件格式 schema | ✅ | IndexedDB v10 |
 | 4 | 拼图图纸识别算法 | ✅ | 边缘检测+矢量化 |
@@ -93,13 +93,20 @@ with sync_playwright() as p:
 ```
 
 ### 2.3 爬取成果
-- **总大小**：606 MB
+- **总大小**：606 MB（磁盘占用口径，`du -sh`，含 4K 块对齐 + 外层 3 个子目录的目录元数据）
 - **文件数**：2742 个
 - **关键产物**：
   - HTML 路由：`/`、`/workspace/{create,gallery,inventory,tools,account}`、`/tools/ai-pixel-art`、`/tools/perfect-pixel`、`/tools/xhs`、`/editor`、`/tutorials`
   - JS chunks：`_next/static/chunks/` 下数百个 minified chunk
   - 字体：`_next/static/media/` 下 woff2 字体
   - 结果图样本：`oss-cdn.i2tools.com/ai-results/...webp`、`/perler/cloud-backups/.../cover.webp`
+
+> **大小口径说明（606M vs 414M）**：解压后的 `i2tools/` 外层含 3 个子目录（`i2tools.com/` 网站主体 + `gallery-images/` 作品库图片 + `oss-cdn.i2tools.com/` CDN 壳），三者合计：
+> - 磁盘占用（`du -sh`）= **606 MB**（含 4K 块对齐与目录元数据，本文档采用此口径）
+> - 纯文件字节合计（`find -printf '%s'`）= **≈ 594 MB**（567 MiB）
+> - 下载到的**压缩包**（gzip/tar 压缩后）= **≈ 414 MB**（纯文本 / 静态资源压缩率约 30%）
+>
+> 因此 **解压前 414M（压缩包）/ 解压后 606M（磁盘占用）都是正常的**，资料完整无缺。OSS 实际拿到部分真实 `.webp`，R2 `r2-uploads` 仅为目录壳（详见 DEV §12.3 缺口 #5）。
 
 ### 2.4 反爬应对策略
 

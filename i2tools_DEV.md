@@ -9,7 +9,7 @@
 | 目标读者 | 全栈开发 / 运维 / 接手团队 |
 | 来源 | 基于 i2tools.com 实测逆向整理（参见 `file:///workspace/i2tools_review.md`） |
 | 关联文档 | `file:///workspace/i2tools_PRD.md`（产品需求文档，业务侧落点） |
-| 爬取样本 | `/workspace/i2tools/` 目录（2742 文件 / 606MB） |
+| 爬取样本 | `/workspace/i2tools/` 目录（2742 文件 / 606MB 磁盘占用；纯文件 ≈594MB，下载压缩包 ≈414MB） |
 
 > 说明：本文档所有架构、代码、API、部署命令均来自 2026-09-13 的真实在线实测与 JS chunk 反编译。业务需求规格请查阅 PRD 文档对应章节。
 
@@ -1328,7 +1328,7 @@ await page.locator('button:has-text("创建项目")')
 | 产品需求 | `file:///workspace/i2tools_PRD.md` |
 | 开发文档 | `file:///workspace/i2tools_DEV.md`（本文档） |
 | 必跑 | 所有 `test_*.py` 脚本（详见 §8） |
-| 必查 | `/workspace/i2tools/` 目录（2742 文件爬取样本，606MB） |
+| 必查 | `/workspace/i2tools/` 目录（2742 文件爬取样本，606MB 磁盘占用 / 压缩包 ≈414MB，口径详见 review.md §2.3） |
 | 关键 chunk | `9872`(3D) / `8071`(颜色) / `6777`(去噪) / `9350`(MARD) / `7824`(IDB) / `1720`(小红书) |
 | 实测样本 | `/workspace/AI像素画-2026-09-13-136x196-20260913203224.pbp` + `.plain.json` |
 | | `/workspace/exports/项目-2026-09-13-205x307-20260913135933.pbp` + `.plain.json` |
@@ -1438,7 +1438,7 @@ await page.locator('button:has-text("创建项目")')
    - perfect-pixel `to.aS` 函数体 - 反编译 chunk 1720
    - 小红书 worker 内部反爬 - 需要部署 xhs-worker 服务实测（用户决定不测）
 4. 任何关键决策前，优先参考：
-   - `/workspace/i2tools/` 爬取样本（2742 文件，606MB）
+   - `/workspace/i2tools/` 爬取样本（2742 文件，606MB 磁盘占用 / 压缩包 ≈414MB）
    - `test_*.py` 实测脚本（27 个，覆盖所有功能模块）
    - `/workspace/i2tools_review.md` 复盘文档（附录 A~I 完整证据链）
    - `/workspace/verify_chunks.py` / `verify_v2.py` / `verify_v3.py` / `verify_v4.py`（反编译验证脚本）

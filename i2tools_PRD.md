@@ -693,7 +693,7 @@ i2tools 后端代理 → 请求小红书 SSR HTML
 | 产品需求 | `file:///workspace/i2tools_PRD.md`（本文档） |
 | 开发文档 | `file:///workspace/i2tools_DEV.md` |
 | 必跑 | 所有 `test_*.py` 脚本（详见 DEV §8） |
-| 必查 | `/workspace/i2tools/` 目录（2742 文件爬取样本，606MB） |
+| 必查 | `/workspace/i2tools/` 目录（2742 文件爬取样本，606MB 磁盘占用 / 压缩包 ≈414MB，口径详见 review.md §2.3） |
 | 联系 | 原作者 `aq.jinlong@163.com` |
 
 ---
@@ -796,7 +796,7 @@ i2tools 后端代理 → 请求小红书 SSR HTML
    - perfect-pixel `to.aS` 函数体 - 反编译 chunk 1720
    - 小红书 worker 内部反爬 - 需要部署 xhs-worker 服务实测（用户决定不测）
 4. 任何关键决策前，优先参考：
-   - `/workspace/i2tools/` 爬取样本（2742 文件，606MB）
+   - `/workspace/i2tools/` 爬取样本（2742 文件，606MB 磁盘占用 / 压缩包 ≈414MB）
    - `test_*.py` 实测脚本（27 个，覆盖所有功能模块）
    - `/workspace/i2tools_review.md` 复盘文档
    - `/workspace/verify_chunks.py` / `verify_v2.py` / `verify_v3.py` / `verify_v4.py`（反编译验证脚本）
