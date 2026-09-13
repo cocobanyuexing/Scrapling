@@ -664,60 +664,60 @@ i2tools 后端代理 → 请求小红书 SSR HTML
 | 3 | 下载结果图误用 `sourceFileName` 当 URL | 任务响应 `images` 字段 | 真实 URL 为 `https://oss-cdn.i2tools.com/ai-results/...` |
 | 4 | 注册走错域名 `/en`（英文版）收不到验证码 | 用户指出主域名是 i2tools.com | 直接登录已注册账号，跳过重新注册 |
 
-### 11.2 置信度分级
+### 11.2 反编译 chunk 验证发现的错误（v2 修正）
 
-#### A. 实测确认（高置信度，有直接证据）
+> ⚠️ 用户反馈"未实测就推测"后，反编译全部 72 个 chunk 文件，**发现 4 处算法推测错误**：
 
-| 项 | 证据类型 |
+| # | 文档原写法 | 反编译发现 | 修正后结论 |
+|:---:|:---|:---|:---|
+| 5 | "K-D Tree 7 叉树加速结构" | chunk 8071 实际是朴素线性扫描+Map 缓存 | 颜色匹配用朴素线性扫描+Map 缓存 CAM16-UCS 转换结果 |
+| 6 | "Median Cut 调色板提取" | 全部 chunk 0 命中 medianCut | **Median Cut 不存在**，调色板来自固定 MARD 221 色 |
+| 7 | "拼图图纸识别 Canny/Sobel 边缘检测" | chunk 3107 实际有 `MardCnn="mard-cnn"` 模式 | **实际算法是 MARD-CNN 卷积神经网络**（非边缘检测） |
+| 8 | "小红书客户端对抗反爬" | chunk 1720 调用 `xhs-worker.i2tools.com/extract` | **i2tools 用自己的服务端 worker 代理**，客户端只发 shareText |
+
+### 11.3 置信度分级（v2 修正后）
+
+#### A. 实测确认（高置信度，反编译验证）
+
+- 前端 Next.js/PixiJS v8/Zustand/Axios/Zod/next-intl（chunk 反编译确认）
+- 后端 Express（响应头实测）
+- 颜色匹配 DeltaEHybrid + CAM16-UCS（chunk 8071 反编译：枚举 `e.DeltaEHybrid/e.Cam16Ucs` + `findClosestPaletteColorCam16Ucs` 函数）
+- 像素化 4 模式（chunk 8071 反编译：完整枚举 Structural/Dominant/Average/PixelArtOptimized）
+- 去噪 4 预设 + 8 连通（chunk 6777 反编译：参数表 `connectivity:8` + light/balanced/strong/aggressive）
+- **拼图图纸识别 = MARD-CNN**（chunk 3107 反编译：`e.MardCnn="mard-cnn"` + 3 阶段 Cropping/Segmenting/Review）
+- **小红书导入 = xhs-worker 服务端代理**（chunk 1720 反编译：`xhs-worker.i2tools.com/extract` + `/proxy?u=`）
+- MARD 色号体系 221 色（chunk 9350 反编译：`brands.mard.definitions` 含 H1-H19/G1-G13/C2-C29/M3-M15 等 200+ 色号）
+- OSS/R2/IndexedDB v10/.pbp AES-GCM-256（实测确认）
+
+#### B. 推测（中置信度，未完全反编译）
+
+- perfect-pixel 内部步骤（边界扫描→量化→重采样）— 函数 `to.aS` 已找到，内部实现未反编译
+- 去噪 8 连通扫描方法（BFS/DFS/迭代）— `connectivity:8` 确认，但没看到 floodFill/BFS/DFS 字样
+- 库存扣减时序/回滚 — API 实测通过，内部逻辑推测
+
+#### C. 之前推测，现已推翻（错误推测）
+
+| 原推测 | 修正后 |
 |:---|:---|
-| 前端 Next.js 19.2.0-canary App Router | 路由结构 + chunk 文件名 + `__next` 数据特征 |
-| PixiJS v8（WebGPU + WebGL 双路径） | vendor chunk 字符串 + 渲染器实例化代码 |
-| Zustand 状态管理 | state 调用模式 `s.G.getState()` 实测 |
-| Axios 1.18.1 / Zod 4.4.3 | npm 包版本字符串实测 |
-| next-intl 国际化 | `[locale]` 路由 + `NEXT_LOCALE` cookie 实测 |
-| 后端 Node.js + Express | 响应头 `x-powered-by: Express` |
-| 阿里云 OSS（结果图） | `oss-cdn.i2tools.com` 域名 + 结果图 URL 实测 |
-| Cloudflare R2（上传存储） | `r2-uploads` 路径实测 |
-| IndexedDB v10 `magic-perler-projects` | 数据库版本 + object stores 实测 |
-| .pbp 格式 `{version, format, data}` | 实测解密成功 |
-| AES-GCM-256 + PBKDF2(SHA-256, 100000, perler-salt) | 解密参数实测验证 |
-| 后处理 4 预设（light/balanced/strong/aggressive） | 弹窗 dump 实测 |
-| MARD 色号体系 H/G/C/M 221 色 | `brands.mard.definitions` 实测 |
-| 小红书 Vue 3 + formula-runtime | vendor chunk + `data-v-` 标记实测 |
-| 小红书 openresty 网关 | 响应头实测 |
-| 小红书 x-s / x-s-common / x-t 签名头 | XHR 抓包实测 |
-| API 端点 14 个 | 实测调用 + 响应 body |
+| ❌ K-D Tree 7 叉树加速结构 | ✅ 朴素线性扫描 + Map 缓存 |
+| ❌ Median Cut 调色板提取 | ✅ 不存在，调色板来自固定 MARD 221 色 |
+| ❌ 拼图图纸识别 Canny/Sobel | ✅ 实际是 MARD-CNN 卷积神经网络 |
+| ❌ 小红书客户端对抗 x-s 反爬 | ✅ i2tools 服务端 worker 代理 |
 
-#### B. 推测（中置信度，基于间接证据推断）
+#### D. 高度推测/不确定（低置信度，需接手者验证）
 
-| 项 | 推测依据 | 不确定点 |
-|:---|:---|:---|
-| 颜色匹配算法 DeltaEHybrid + CAM16-UCS | JS chunk 字符串看到类名 | 具体调用流程、参数选择是推测的 |
-| K-D Tree 7 叉树加速结构 | chunk 字符串推测 | 树的构建/查询细节未实测 |
-| Median Cut 调色板提取 | chunk 字符串推测 | 具体实现未反编译完整 |
-| 像素化 4 模式（Structural/Dominant/Average/PixelArtOptimized） | 模式名实测 | 各模式算法差异是推测的 |
-| perfect-pixel 修正算法 | 推测"借鉴开源思路重写 TS 版" | 原始开源出处未确认 |
-| 去噪 8 连通域 BFS | 基于参数表推测实现 | BFS/DFS 选择、扫描顺序未确认 |
-| 库存扣减色号累加逻辑 | API 实测通过 | 扣减的具体时序、回滚机制推测 |
+- 数据库 Schema/SQL DDL（基于 API 反推，非生产 schema）
+- 环境变量清单（OSS/R2 实测，其它推测）
+- 部署命令/Redis 使用/Nginx 配置示例
+- MARD-CNN 模型架构（只确认模式枚举，CNN 网络结构未反编译）
+- 小红书 worker 内部反爬实现（只看到客户端调用，worker 内部未实测）
 
-#### C. 高度推测/不确定（低置信度，需接手者验证）
+### 11.4 接手者建议
 
-| 项 | 现状 | 建议 |
-|:---|:---|:---|
-| 拼图图纸识别 Canny/Sobel 边缘检测 | **完全是推测，无反编译证据** | 接手后应优先反编译图纸识别 chunk 验证 |
-| 数据库 Schema（users/projects/inventory/checkin/orders/products） | 基于 API 返回结构反推 | 真实表结构、字段类型、索引需查实际 DDL |
-| SQL DDL 语句 | 完全推测 | 仅供建库参考，非生产 schema |
-| 环境变量清单 | OSS/R2 实测，JWT_SECRET/XSRF_SECRET 等推测 | 部署前需向原作者确认 |
-| 部署命令 `pnpm db:migrate` 等 | 推测 | 需查 `package.json` scripts 字段确认 |
-| Redis 使用 | "可选"是推测 | 未实测是否有 Redis |
-| Nginx 反代配置示例 | 推测的模板 | 需根据实际部署环境调整 |
-
-### 11.3 接手者建议
-
-1. **高置信度项**可直接采信，作为接手基础
-2. **中置信度项**需进一步反编译 JS chunk 验证（关键 chunk：`9872`(3D) / `8071`(颜色) / `6777`(去噪) / `9350`(MARD) / `7824`(IDB) / `1720`(小红书)）
-3. **低置信度项**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证
-4. 任何关键决策前，优先参考 `/workspace/i2tools/` 爬取样本（2742 文件）和 `test_*.py` 实测脚本
+1. **A 类高置信度项**可直接采信
+2. **B 类中置信度项**用 `/workspace/verify_*.py` 脚本复现反编译验证
+3. **D 类低置信度项**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证
+4. 任何关键决策前，优先参考 `/workspace/i2tools/` 爬取样本 + `test_*.py` 实测脚本 + `i2tools_review.md` 复盘文档
 
 ---
 

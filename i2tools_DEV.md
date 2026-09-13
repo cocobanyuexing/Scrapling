@@ -396,14 +396,15 @@ Cookie: XSRF-TOKEN=<token>; session=<session_id>
 
 ### 4.1 颜色匹配
 
-来源：chunk `8071-30a1b464baed2037.js`
+来源：chunk `8071-30a1b464baed2037.js`（已反编译验证）
 
-| 算法 | 用途 | 关键点 |
-|:---|:---|:---|
-| **Median Cut** | 调色板提取 | 经典分箱法，递归切分最长通道 |
-| **K-D Tree** | 最近邻加速 | 7 叉树近邻搜索，加速量化 |
-| **DeltaEHybrid** | 颜色距离 | CIE Delta E 混合算法 |
-| **CAM16-UCS** | 颜色距离 | 更符合人眼感知的高级算法（实测项目默认 `cam16-ucs`） |
+| 算法 | 用途 | 关键点 | 验证状态 |
+|:---|:---|:---|:---:|
+| **DeltaEHybrid** | 颜色距离 | CIE Delta E 混合算法（枚举 `e.DeltaEHybrid="delta-e-hybrid"`） | ✅ 反编译确认 |
+| **CAM16-UCS** | 颜色距离 | 更符合人眼感知的高级算法（实测项目默认 `cam16-ucs`，函数 `findClosestPaletteColorCam16Ucs`） | ✅ 反编译确认 |
+| **朴素线性扫描 + Map 缓存** | 最近邻加速 | `for(let e of c){...r.get(e.key)...}` 遍历调色板，Map 缓存 CAM16-UCS 转换结果 | ✅ 反编译确认（**非 K-D Tree**） |
+| ~~K-D Tree 7 叉树~~ | ~~最近邻加速~~ | ~~7 叉树近邻搜索~~ | ❌ 推测错误，实际不存在 |
+| ~~Median Cut~~ | ~~调色板提取~~ | ~~经典分箱法~~ | ❌ 推测错误，调色板来自固定 MARD 221 色 |
 
 #### 颜色距离实现（去噪 / 合并共用，sRGB 空间加权）
 
@@ -530,13 +531,33 @@ function g(e, t = 8) {
 
 ### 4.5 拼图图纸识别算法
 
-来源：chunk `1720`
+来源：chunk `3107-465456a81e8a9713.js`（已反编译验证）
 
-流程：
-1. 图纸上传 → 边缘检测（Canny / Sobel）
-2. 矢量化 → 提取色块边界
-3. 颜色识别 → 匹配 MARD 色号
-4. 网格重建 → 生成项目 layers
+**真实算法 = MARD-CNN 卷积神经网络**（非 Canny/Sobel 边缘检测）
+
+反编译证据：
+```js
+e.GridAlign=3  // 网格对齐阶段
+i = function(e){return e.Cropping="cropping", e.Segmenting="segmenting", e.Review="review", e}({})
+l = function(e){return e.Full="full", e.MardCnn="mard-cnn", e}({})  // 两种识别模式
+```
+
+流程（3 阶段 + 2 阶段）：
+1. **Cropping**（裁剪）- 用户裁剪大图色号区域
+2. **Segmenting**（分割）- CNN 模型分割色块
+3. **Review**（审核）- 用户审核识别结果
+4. **GridAlign**（网格对齐）- 对齐到拼豆网格
+5. **Verification**（验证）- 验证色号匹配
+
+两种识别模式：
+- `Full`（全图）- 整图识别
+- `MardCnn`（MARD-CNN）- 用 MARD 卷积神经网络识别色号卡
+
+> ⚠️ 之前文档推测的 Canny/Sobel 边缘检测**完全错误**，实际是 CNN 卷积神经网络。CNN 模型架构本身未反编译（待接手者验证）。
+
+历史更新日志佐证（chunk 2298）：
+- v2.0.6: "优化 '导入拼豆图纸生成' -> '扫描色号卡' 模式下裁剪的大图色号区域无法准确识别的问题"
+- v2.0.6: "优化 '导入拼豆图纸生成' 品牌色号识别过程"
 
 ### 4.6 库存扣减算法
 
@@ -1137,14 +1158,25 @@ await page.locator('button:has-text("创建项目")')
 | 5 | PixiJS `readPixels` 返回空 | `preserveDrawingBuffer` 未设 | 改用 `screenshot()` + `toDataURL()` |
 | 6 | `page.locator().click()` 被 dialog-overlay 拦截 | Radix focus trap 拦截原生事件 | 用 `evaluate(btn => btn.click())` 调原生方法 |
 
-### 11.2 置信度分级
+### 11.2 反编译 chunk 验证发现的错误（v2 修正）
 
-#### A. 实测确认（高置信度，有直接证据）
+> ⚠️ 用户反馈"未实测就推测"的问题后，本次反编译所有 chunk 文件，**发现 4 处算法推测错误**。
+
+| # | 文档原写法 | 反编译发现 | 修正后结论 | 章节 |
+|:---:|:---|:---|:---|:---:|
+| 7 | "K-D Tree 7 叉树加速结构" | chunk 8071 实际是**朴素线性扫描 + Map 缓存**（`for(let e of c){...}`），无 kdTree 关键字 | 颜色匹配用朴素线性扫描+Map 缓存 CAM16-UCS 转换结果 | §4.1 |
+| 8 | "Median Cut 调色板提取" | 全部 72 个 chunk 0 命中 medianCut/kmeans/octree/quantization | **Median Cut 不存在**，调色板来自固定 MARD 221 色 | §4.1 |
+| 9 | "拼图图纸识别 Canny/Sobel 边缘检测" | 全部 chunk 0 命中 canny/sobel/edgeDetection/houghTransform；实际在 chunk 3107 找到 `MardCnn="mard-cnn"` 模式 | **实际算法是 MARD-CNN 卷积神经网络**（非边缘检测），含 3 阶段：Cropping→Segmenting→Review + GridAlign/Verification | §4.5 |
+| 10 | "小红书导入客户端对抗反爬（x-s/x-s-common 签名）" | chunk 1720 实际调用 `https://xhs-worker.i2tools.com/extract` POST `{shareText}` + `/proxy?u=` | **i2tools 用自己的服务端 worker 代理**，客户端只发 shareText，不直接对抗反爬（之前研究的 x-s 签名是研究方向错误） | 附录 I |
+
+### 11.3 置信度分级（v2 修正后）
+
+#### A. 实测确认（高置信度，有直接证据 - 反编译验证）
 
 | 项 | 证据类型 | 章节 |
 |:---|:---|:---:|
 | 前端 Next.js 19.2.0-canary App Router | 路由结构 + chunk 文件名 + `__next` 数据特征 | §2.1 |
-| PixiJS v8（WebGPU + WebGL 双路径） | vendor chunk 字符串 + 渲染器实例化代码 | §2.3 |
+| PixiJS v8（WebGPU + WebGL 双路径） | chunk 9872 含 WGSL+GLSL 着色器代码（`uProjectionMatrix`/`mat3x3<f32>`） | §2.3 |
 | Zustand 状态管理 | state 调用模式 `s.G.getState()` 实测 | §2.2 |
 | Axios 1.18.1 / Zod 4.4.3 | npm 包版本字符串实测 | §1.2 |
 | next-intl 国际化 | `[locale]` 路由 + `NEXT_LOCALE` cookie 实测 | §2.1 |
@@ -1154,58 +1186,69 @@ await page.locator('button:has-text("创建项目")')
 | IndexedDB v10 `magic-perler-projects` | 数据库版本 + object stores 实测 | §2.4 |
 | .pbp 格式 `{version, format, data}` | 实测解密成功 | §5 |
 | AES-GCM-256 + PBKDF2(SHA-256, 100000, perler-salt) | 解密参数实测验证（`decode_pbp.js` 跑通） | §5.2 |
-| 后处理 4 预设（light/balanced/strong/aggressive） | 弹窗 dump 实测 | §4.4 |
-| MARD 色号体系 H/G/C/M 221 色 | `brands.mard.definitions` 实测 | §4.6 |
+| **颜色匹配 DeltaEHybrid + CAM16-UCS** | chunk 8071 反编译：`e.DeltaEHybrid="delta-e-hybrid",e.Cam16Ucs="cam16-ucs"` + `findClosestPaletteColorCam16Ucs` 函数 | §4.1 |
+| **像素化 4 模式（Structural/Dominant/Average/PixelArtOptimized）** | chunk 8071 反编译：完整枚举 `e.Structural="structural",e.Dominant="dominant",e.Average="average",e.PixelArtOptimized="pixel-art-optimized"` | §4.2 |
+| **去噪 4 预设 + 8 连通** | chunk 6777 反编译：参数表 `connectivity:8` + 4 预设（light/balanced/strong/aggressive）+ areaThreshold/passes/maxColorDistance/minContactRatio | §4.4 |
+| **拼图图纸识别 = MARD-CNN** | chunk 3107 反编译：`e.MardCnn="mard-cnn"` + 3 阶段 `Cropping/Segmenting/Review` + GridAlign/Verification | §4.5 |
+| **小红书导入 = xhs-worker 服务端代理** | chunk 1720 反编译：`https://xhs-worker.i2tools.com/extract` POST `{shareText}` + `/proxy?u=` + `XhsMediaExtractorError` | 附录 I |
+| MARD 色号体系 H/G/C/M 221 色 | chunk 9350 反编译：`brands.mard.definitions` 含 H1-H19/G1-G13/C2-C29/M3-M15/A4-A24/B3-B24/D3-D23/E2-E24/F5-F24/P1-P23/Q1 等 200+ 色号 | §4.6 |
 | API 端点 14 个 | 实测调用 + 响应 body | §3.1 |
-| 小红书 Vue 3 + formula-runtime | vendor chunk + `data-v-` 标记实测 | 附录 I |
-| 小红书 openresty 网关 | 响应头实测 | 附录 I |
-| 小红书 x-s / x-s-common / x-t 签名头 | XHR 抓包实测 | 附录 I |
 
-#### B. 推测（中置信度，基于间接证据推断）
+#### B. 推测（中置信度，未完全反编译验证）
 
 | 项 | 推测依据 | 不确定点 | 章节 |
 |:---|:---|:---|:---:|
-| 颜色匹配算法 DeltaEHybrid + CAM16-UCS | JS chunk 字符串看到类名 | 具体调用流程、参数选择是推测的 | §4.1 |
-| K-D Tree 7 叉树加速结构 | chunk 字符串推测 | 树的构建/查询细节未实测 | §4.1 |
-| Median Cut 调色板提取 | chunk 字符串推测 | 具体实现未反编译完整 | §4.1 |
-| 像素化 4 模式（Structural/Dominant/Average/PixelArtOptimized） | 模式名实测 | 各模式算法差异是推测的 | §4.2 |
-| perfect-pixel 修正算法 | 推测"借鉴开源思路重写 TS 版" | 原始开源出处未确认 | §4.3 |
-| 去噪 8 连通域 BFS | 基于参数表推测实现 | BFS/DFS 选择、扫描顺序未确认 | §4.4 |
+| perfect-pixel 修正算法 | chunk 1720 含 `to.aS` 函数（参数 imageSource/gridDimensions/projectName/pixelLayerName/referenceLayerName） | 函数内部实现未反编译完整，"借鉴开源思路重写 TS 版"是推测 | §4.3 |
+| 去噪 8 连通域扫描方法 | chunk 6777 含 `connectivity:8`，但**没看到 floodFill/BFS/DFS 字样** | 实际是 BFS/DFS/迭代扫描的哪一种未确认 | §4.4 |
 | 库存扣减色号累加逻辑 | API 实测通过 | 扣减的具体时序、回滚机制推测 | §4.6 |
+| perfect-pixel 内部步骤（边界扫描→量化→重采样） | 基于函数名和参数推测 | 实际步骤未反编译验证 | §4.3 |
 
-#### C. 高度推测/不确定（低置信度，需接手者验证）
+#### C. 之前推测，现已修正/推翻（低置信度 - 错误推测）
+
+| 原推测 | 修正后 | 章节 |
+|:---|:---|:---:|
+| ❌ K-D Tree 7 叉树加速结构 | ✅ 朴素线性扫描 + Map 缓存（`for(let e of c){...r.get(e.key)...}`） | §4.1 |
+| ❌ Median Cut 调色板提取 | ✅ 不存在，调色板来自固定 MARD 221 色 | §4.1 |
+| ❌ 拼图图纸识别 Canny/Sobel | ✅ 实际是 MARD-CNN 卷积神经网络 | §4.5 |
+| ❌ 小红书客户端对抗 x-s 反爬 | ✅ i2tools 服务端 worker 代理 | 附录 I |
+
+#### D. 高度推测/不确定（低置信度，需接手者验证）
 
 | 项 | 现状 | 建议 | 章节 |
 |:---|:---|:---|:---:|
-| 拼图图纸识别 Canny/Sobel 边缘检测 | **完全是推测，无反编译证据** | 接手后应优先反编译图纸识别 chunk 验证 | §4.5 |
 | 数据库 Schema（users/projects/inventory/checkin/orders/products） | 基于 API 返回结构反推 | 真实表结构、字段类型、索引需查实际 DDL | §7 |
 | SQL DDL 语句 | 完全推测 | 仅供建库参考，非生产 schema | §7 |
 | 环境变量清单 | OSS/R2 实测，JWT_SECRET/XSRF_SECRET 等推测 | 部署前需向原作者确认 | §6.2 |
 | 部署命令 `pnpm db:migrate` 等 | 推测 | 需查 `package.json` scripts 字段确认 | §6.3 |
 | Redis 使用 | "可选"是推测 | 未实测是否有 Redis | §6.1 |
 | Nginx 反代配置示例 | 推测的模板 | 需根据实际部署环境调整 | §6.3 |
+| MARD-CNN 模型架构 | 只确认存在 `MardCnn` 枚举，未反编译网络结构 | 接手后应反编译 chunk 3107 验证 CNN 架构 | §4.5 |
+| 小红书 worker 反爬实现 | 只看到客户端调用 `/extract`，worker 内部如何反爬未实测 | 接手后应部署 xhs-worker 服务实测 | 附录 I |
 
-### 11.3 验证路径（接手者必读）
+### 11.4 验证路径（接手者必读）
 
 1. **高置信度项（A 类）**可直接采信，作为接手基础
 2. **中置信度项（B 类）**需进一步反编译 JS chunk 验证：
-   - 关键 chunk：`9872`(3D) / `8071`(颜色) / `6777`(去噪) / `9350`(MARD) / `7824`(IDB) / `1720`(小红书)
-   - 验证方法：`node -e "require('./i2tools/.../chunk-9872.js')"` 或用 webpack-unpack
-3. **低置信度项（C 类）**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证：
-   - 数据库 DDL：请求原作者提供 `schema.sql` 或 migration 文件
-   - 环境变量：请求原作者提供 `.env.example`
-   - 拼图图纸识别：反编译图纸识别专用 chunk（待定位）
+   - chunk 8071（颜色匹配）- 已反编译验证 ✅
+   - chunk 6777（去噪参数）- 已反编译验证 ✅
+   - chunk 3107（拼图图纸 MARD-CNN）- 已反编译模式枚举 ✅，CNN 架构未验证
+   - chunk 1720（perfect-pixel + 小红书 worker）- 部分验证
+   - chunk 9350（MARD 色号）- 已反编译验证 ✅
+   - chunk 9872（3D 渲染）- 已反编译着色器代码 ✅
+3. **低置信度项（D 类）**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证
 4. 任何关键决策前，优先参考：
    - `/workspace/i2tools/` 爬取样本（2742 文件，606MB）
    - `test_*.py` 实测脚本（27 个，覆盖所有功能模块）
    - `/workspace/i2tools_review.md` 复盘文档（附录 A~I 完整证据链）
+   - `/workspace/verify_chunks.py` / `verify_v2.py` / `verify_v3.py` / `verify_v4.py`（反编译验证脚本）
 
-### 11.4 持续修正机制
+### 11.5 持续修正机制
 
-本文档基于 2026-09-13 的实测快照整理。如接手者在验证过程中发现新证据与文档不符，请：
+本文档基于 2026-09-13 的实测快照整理，并经反编译验证修正（v2）。如接手者在验证过程中发现新证据与文档不符，请：
 1. 在对应章节标注 `[待修正：YYYY-MM-DD 发现 ...]`
 2. 将新证据补入 `i2tools_review.md` 附录
 3. 同步更新 PRD 和 DEV 两个文档
+4. 用 `/workspace/verify_*.py` 脚本复现反编译验证过程
 
 ---
 
