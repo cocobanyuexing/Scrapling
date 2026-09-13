@@ -651,4 +651,74 @@ i2tools 后端代理 → 请求小红书 SSR HTML
 
 ---
 
+## 11. 准确度说明（重要）
+
+> ⚠️ 本文档基于对 i2tools.com 的**逆向实测**整理。在编写过程中曾出现过分析错误并借助辅助工具修正，因此本章节明确标注各项内容的**置信度**，供接手者判断。
+
+### 11.1 之前修正过的错误（历史记录）
+
+| # | 错误内容 | 修正依据 | 修正后结论 |
+|:---:|:---|:---|:---|
+| 1 | 后端框架误判为 Laravel | 响应头 `x-powered-by: Express` | Node.js + Express |
+| 2 | 登录邮箱 `aq.jilong@163.com` 失败 | 用户确认实际注册邮箱 | `aq.jinlong@163.com`（"jilong" → "jinlong"） |
+| 3 | 下载结果图误用 `sourceFileName` 当 URL | 任务响应 `images` 字段 | 真实 URL 为 `https://oss-cdn.i2tools.com/ai-results/...` |
+| 4 | 注册走错域名 `/en`（英文版）收不到验证码 | 用户指出主域名是 i2tools.com | 直接登录已注册账号，跳过重新注册 |
+
+### 11.2 置信度分级
+
+#### A. 实测确认（高置信度，有直接证据）
+
+| 项 | 证据类型 |
+|:---|:---|
+| 前端 Next.js 19.2.0-canary App Router | 路由结构 + chunk 文件名 + `__next` 数据特征 |
+| PixiJS v8（WebGPU + WebGL 双路径） | vendor chunk 字符串 + 渲染器实例化代码 |
+| Zustand 状态管理 | state 调用模式 `s.G.getState()` 实测 |
+| Axios 1.18.1 / Zod 4.4.3 | npm 包版本字符串实测 |
+| next-intl 国际化 | `[locale]` 路由 + `NEXT_LOCALE` cookie 实测 |
+| 后端 Node.js + Express | 响应头 `x-powered-by: Express` |
+| 阿里云 OSS（结果图） | `oss-cdn.i2tools.com` 域名 + 结果图 URL 实测 |
+| Cloudflare R2（上传存储） | `r2-uploads` 路径实测 |
+| IndexedDB v10 `magic-perler-projects` | 数据库版本 + object stores 实测 |
+| .pbp 格式 `{version, format, data}` | 实测解密成功 |
+| AES-GCM-256 + PBKDF2(SHA-256, 100000, perler-salt) | 解密参数实测验证 |
+| 后处理 4 预设（light/balanced/strong/aggressive） | 弹窗 dump 实测 |
+| MARD 色号体系 H/G/C/M 221 色 | `brands.mard.definitions` 实测 |
+| 小红书 Vue 3 + formula-runtime | vendor chunk + `data-v-` 标记实测 |
+| 小红书 openresty 网关 | 响应头实测 |
+| 小红书 x-s / x-s-common / x-t 签名头 | XHR 抓包实测 |
+| API 端点 14 个 | 实测调用 + 响应 body |
+
+#### B. 推测（中置信度，基于间接证据推断）
+
+| 项 | 推测依据 | 不确定点 |
+|:---|:---|:---|
+| 颜色匹配算法 DeltaEHybrid + CAM16-UCS | JS chunk 字符串看到类名 | 具体调用流程、参数选择是推测的 |
+| K-D Tree 7 叉树加速结构 | chunk 字符串推测 | 树的构建/查询细节未实测 |
+| Median Cut 调色板提取 | chunk 字符串推测 | 具体实现未反编译完整 |
+| 像素化 4 模式（Structural/Dominant/Average/PixelArtOptimized） | 模式名实测 | 各模式算法差异是推测的 |
+| perfect-pixel 修正算法 | 推测"借鉴开源思路重写 TS 版" | 原始开源出处未确认 |
+| 去噪 8 连通域 BFS | 基于参数表推测实现 | BFS/DFS 选择、扫描顺序未确认 |
+| 库存扣减色号累加逻辑 | API 实测通过 | 扣减的具体时序、回滚机制推测 |
+
+#### C. 高度推测/不确定（低置信度，需接手者验证）
+
+| 项 | 现状 | 建议 |
+|:---|:---|:---|
+| 拼图图纸识别 Canny/Sobel 边缘检测 | **完全是推测，无反编译证据** | 接手后应优先反编译图纸识别 chunk 验证 |
+| 数据库 Schema（users/projects/inventory/checkin/orders/products） | 基于 API 返回结构反推 | 真实表结构、字段类型、索引需查实际 DDL |
+| SQL DDL 语句 | 完全推测 | 仅供建库参考，非生产 schema |
+| 环境变量清单 | OSS/R2 实测，JWT_SECRET/XSRF_SECRET 等推测 | 部署前需向原作者确认 |
+| 部署命令 `pnpm db:migrate` 等 | 推测 | 需查 `package.json` scripts 字段确认 |
+| Redis 使用 | "可选"是推测 | 未实测是否有 Redis |
+| Nginx 反代配置示例 | 推测的模板 | 需根据实际部署环境调整 |
+
+### 11.3 接手者建议
+
+1. **高置信度项**可直接采信，作为接手基础
+2. **中置信度项**需进一步反编译 JS chunk 验证（关键 chunk：`9872`(3D) / `8071`(颜色) / `6777`(去噪) / `9350`(MARD) / `7824`(IDB) / `1720`(小红书)）
+3. **低置信度项**务必向原作者 `aq.jinlong@163.com` 确认，或通过实际部署验证
+4. 任何关键决策前，优先参考 `/workspace/i2tools/` 爬取样本（2742 文件）和 `test_*.py` 实测脚本
+
+---
+
 **文档结束**
