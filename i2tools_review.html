@@ -197,7 +197,7 @@
   <div class="meta">
     <span>目标网站：<code>https://i2tools.com/</code>（产品名"幻彩拼豆"）</span>
     <span>复盘日期：2026-09-13</span>
-    <span>文档版本：<strong>v3.0</strong>（B 类 4 项升级 A 类 + 6 项错误推测修正）</span>
+    <span>文档版本：<strong>v4.0</strong>（B 类 4 项升级 A 类 + 6 项错误推测修正 + 新增附录 J 复刻可行性评估）</span>
   </div>
   <div class="meta" style="margin-top:0.4rem">
     <span>范围：网站爬取 → 技术栈/算法分析 → 实际功能测试 → 完成度核对 + 小红书 PC Web 技术栈</span>
@@ -920,6 +920,56 @@ cb.click(timeout=3000)  # 而非 cb.dispatchEvent(...)</code></pre>
   <li>反编译层面：<strong>100% 完成</strong></li>
   <li>实测层面：<strong>100% 完成</strong>（14/14 功能实测全部通过）</li>
   <li>详见上方任务清单 §1.2</li>
+</ul>
+</div>
+
+<span class="anchor" id="appJ"></span>
+<h2>附录 J：复刻可行性评估（v4 新增）</h2>
+<div class="callout callout-warn">
+<strong>核心问题</strong>："有了这些爬取 + 反编译 + 实测资料，能否搭建一个一模一样、所有功能都对齐的网站？"
+<br><strong>结论</strong>：可以重建一个 <strong>90% 功能对齐的等价站</strong>，但<em>不是</em>字节级 / 效果级的一模一样克隆——会卡在 5 个"拿不到原型"的结构性缺口（§J.3）。完整版与 roadmap 见 <code>i2tools_DEV.md</code> §12 / <code>i2tools_PRD.md</code> §12。
+</div>
+
+<h3>J.1 工具台真实清单（先澄清一个常见误解）</h3>
+<p>工具台<strong>只有 3 个独立工具</strong>（来源：chunk 9173 ToolboxPage 模块 68997 的 <code>C8</code> 数组，是工具台唯一权威清单）：</p>
+<table>
+<thead><tr><th>工具 id</th><th>工具名</th><th>角色</th><th>布局</th></tr></thead>
+<tbody>
+<tr><td><code>ai-pixel-art</code></td><td>AI 像素画生成工具（violet）</td><td>图片→像素画生成（服务端 API）</td><td><code>standalonePage:!0</code> 独立页</td></tr>
+<tr><td><code>perfect-pixel</code></td><td>伪像素画修正工具（amber）</td><td>对已有像素画结果做对齐修正（客户端 Web Worker <code>to.aS</code>）</td><td><code>detailLayout:"viewport"</code></td></tr>
+<tr><td><code>xhs-media</code></td><td>小红书原图提取工具（rose）</td><td>小红书链接→原图提取（服务端 worker 代理）</td><td><code>detailLayout:"document"</code> + SEO 三元组</td></tr>
+</tbody>
+</table>
+<div class="callout callout-info">注意：<code>perfect-pixel</code> 是<strong>独立工具</strong>，不是 <code>ai-pixel-art</code> 的子功能。</div>
+
+<h3>J.2 资产分层（能复刻 / 需补写 / 无法对齐）</h3>
+<table>
+<thead><tr><th>层</th><th>类别</th><th>可复刻度</th></tr></thead>
+<tbody>
+<tr><td>①</td><td>前端 / 渲染 / 算法逻辑</td><td><strong>90%+ 能复刻</strong>（编辑器、像素化 4 模式、去噪 4 预设、颜色匹配、perfect-pixel <code>to.aS</code> 6 参数、MARD-CNN 3 阶段流程）</td></tr>
+<tr><td>②</td><td>后端业务逻辑</td><td><strong>能复刻但需补写</strong>（认证/积分/项目 CRUD/库存扣减/.pbp 加解密，按 API 契约 + 实测行为重写，非复制）</td></tr>
+<tr><td>③</td><td>拿不到原型的黑盒</td><td><strong>无法 1:1 对齐</strong>（下表 5 项）</td></tr>
+</tbody>
+</table>
+
+<h3>J.3 5 个结构性缺口（精确归属到所属工具与技术栈层）</h3>
+<table>
+<thead><tr><th>#</th><th>缺口</th><th>所属工具（工具台名称）</th><th>技术栈层</th><th>现状</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>小红书 worker 内部反爬</td><td><strong>小红书原图提取工具</strong>（<code>xhs-media</code>）</td><td>服务端代理 + 客户端调用</td><td>客户端调 <code>/extract</code> POST shareText + <code>/proxy?u=</code> 已确认；worker 内部如何过小红书 <code>x-s/xsec_token</code> 反爬<strong>未实测</strong>（用户定调不测）</td></tr>
+<tr><td>2</td><td>数据库 Schema（SQL 表）</td><td><strong>全项目服务端</strong>（跨工具底层数据层）</td><td>数据库层</td><td>chunk 7824 只到 IndexedDB；服务端 SQL 表<strong>未公开</strong>（72 chunk 0 命中 <code>CREATE TABLE</code>），§7 DDL 为推测</td></tr>
+<tr><td>3</td><td>MARD-CNN 模型权重</td><td><strong>图纸识别 / 拼图图纸识别工具</strong>（MARD-CNN 流程）</td><td>ML 模型层（客户端推理）</td><td>3 阶段流程 + 客户端推理已确认；<strong>权重张量 / CNN 网络结构未反编译</strong>（0 命中 onnx/weightsUrl）</td></tr>
+<tr><td>4</td><td>AI 像素画 / perfect-pixel 内部</td><td><strong>AI 像素画工具</strong>（<code>ai-pixel-art</code>）+ 独立 <strong>perfect-pixel 工具</strong></td><td>生成模型层 + 算法层</td><td>ai-pixel-art 仅任务提交/轮询 API（生成模型无）；perfect-pixel 仅 <code>to.aS</code> 入口 + 6 参数（内部卷积/迭代未展开）</td></tr>
+<tr><td>5</td><td>OSS / R2 资源内容</td><td><strong>素材 / 对象存储层</strong>（跨工具）</td><td>对象存储层</td><td>R2 <code>r2-uploads</code> 只拿到<strong>目录壳</strong>（0 命中）；OSS 拿到部分真实 <code>.webp</code>；<strong>字体 / 模型二进制未下载</strong></td></tr>
+</tbody>
+</table>
+
+<h3>J.4 复刻结论</h3>
+<div class="callout callout-warn">
+<ul>
+  <li><strong>能做到</strong>：用 ① 前端 + ② 后端，重建<em>功能基本对齐</em>的等价站（编辑器 / 像素化 / 去噪 / 颜色匹配 / 库存 / 项目导出 .pbp 行为一致）。</li>
+  <li><strong>做不到 100% 一样</strong>：卡在 J.3 的 5 个缺口（小红书原图提取、服务端 DB Schema、MARD-CNN 权重、AI 像素画生成质量 + perfect-pixel 内部、OSS/R2 素材二进制）。</li>
+  <li><strong>精确表述</strong>：资料足以支撑<em>"90% 功能对齐的等价重建"</em>，<em>不是</em>"字节级 / 效果级的一模一样克隆"。</li>
 </ul>
 </div>
 
