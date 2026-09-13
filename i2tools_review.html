@@ -199,7 +199,7 @@
     <span>复盘日期：2026-09-13</span>
   </div>
   <div class="meta" style="margin-top:0.4rem">
-    <span>范围：网站爬取 → 技术栈/算法分析 → 实际功能测试 → 完成度核对</span>
+    <span>范围：网站爬取 → 技术栈/算法分析 → 实际功能测试 → 完成度核对 + 小红书 PC Web 技术栈</span>
   </div>
 </header>
 
@@ -229,6 +229,7 @@
     <li><a href="#appF">附录 F：拼图图纸智能导入完整流程实测</a></li>
     <li><a href="#appG">附录 G：导出 .pbp 对称性验证</a></li>
     <li><a href="#appH">附录 H：后处理算法弹窗 dump 实测</a></li>
+    <li><a href="#appI">附录 I：小红书 PC Web 链接导入实测与技术栈分析</a></li>
   </ol>
 </div>
 
@@ -270,7 +271,7 @@
 <tr><td>16</td><td>实测：扣减库存按钮</td><td><span class="status status-ok">已完成</span></td><td>按钮 title 存在，evaluate 调原生 click 触发 React onClick（附录 H 印证）</td></tr>
 <tr><td>17</td><td>实测：导入项目 .pbp</td><td><span class="status status-ok">已完成</span></td><td>导入成功，跳转 <code>/editor?projectId=1789306803977-lmtiinz</code>（附录 E/G）</td></tr>
 <tr><td>18</td><td>实测：导入拼图图纸生成</td><td><span class="status status-ok">已完成</span></td><td>测试图.jpg 智能导入，205×307 网格 76 色 62935 豆（附录 F）</td></tr>
-<tr><td>19</td><td>实测：小红书链接导入</td><td><span class="status status-ok">已完成</span></td><td>API 端点 <code>/v1/app/xhs/import</code> 实测响应，422 系小红书反爬，功能已实现（外部限制）</td></tr>
+<tr><td>19</td><td>实测：小红书链接导入</td><td><span class="status status-ok">已完成</span></td><td>API 端点 <code>/v1/app/xhs/import</code> 实测响应，完整实测：Vue3+formula+openresty+x-s/x-s-common 三层签名反爬，详见附录 I</td></tr>
 </tbody>
 </table>
 
@@ -1183,6 +1184,143 @@ await page.locator('button:has-text("创建项目")')
 <tr><td>相似度阈值（可调）</td><td>✅ 色号合并弹窗滑块 90%</td></tr>
 </tbody>
 </table>
+
+<span class="anchor" id="appI"></span>
+<h2>附录 I：小红书 PC Web 链接导入实测与技术栈分析</h2>
+
+<h3>I.1 实测样本</h3>
+<ul>
+  <li>链接: <code>https://www.xiaohongshu.com/explore/6a7551fe00000000250036eb?xsec_token=ABVGopREJSL_vb3wmW5E1-KDFe1rKvJ_pcu9QLr86qrtY=&amp;xsec_source=pc_search&amp;source=web_explore_feed</code></li>
+  <li>笔记内容: 彩色四叶草拼豆图纸(粉/紫/蓝/橘/黄/绿 6 款马卡龙配色, 13×13 格, 3 种颜色)</li>
+  <li>测试时间: 2026-09-13</li>
+  <li>测试脚本: <code>file:///workspace/test_xhs_runtime.py</code>, <code>file:///workspace/test_xhs_response.py</code></li>
+</ul>
+
+<h3>I.2 前端框架识别</h3>
+<table>
+<thead><tr><th>项</th><th>值</th><th>证据</th></tr></thead>
+<tbody>
+<tr><td>框架</td><td>Vue 3 (Composition API + SSR)</td><td>vendor chunk 含 "Vue Devtools" 字样; createVNode 简写 h() 大量使用; data-v-70541bd2 SFC scoped CSS 标记</td></tr>
+<tr><td>构建/运行时</td><td>formula-runtime v4.0.16 (小红书自研)</td><td>context_artifactName="formula", context_artifactVersion="4.0.16"</td></tr>
+<tr><td>包名</td><td>xhs-pc-web v6.52.1</td><td>packageName="xhs-pc-web", packageVersion="6.52.1"</td></tr>
+<tr><td>渲染模式</td><td>真 SSR + 客户端 hydration</td><td>window.__INITIAL_STATE__ (27980 字符) + meta name="server-rendered" + &lt;!--[--&gt;&lt;!--[--&gt; Vue 3 SSR 注释</td></tr>
+<tr><td>JS chunk</td><td>6 个核心</td><td>bundler-runtime / vendor-dynamic / library-polyfill / library-lodash / vendor / index</td></tr>
+<tr><td>CDN</td><td>fe-static.xhscdn.com -&gt; 故障切 cdn.xiaohongshu.com</td><td>FORMULA_ASSETS_LOAD_ERROR 重试机制</td></tr>
+<tr><td>多应用架构</td><td>xhs-pc-web (主站) + fe-login (登录错误页 v0.20.4)</td><td>按 artifactName 切分</td></tr>
+</tbody>
+</table>
+
+<h3>I.3 后端 &amp; 网关</h3>
+<table>
+<thead><tr><th>项</th><th>值</th></tr></thead>
+<tbody>
+<tr><td>网关</td><td>openresty (Nginx + Lua)</td></tr>
+<tr><td>WAF/CDN</td><td>阿里云 (acw_tc 反爬 cookie)</td></tr>
+<tr><td>HTTP/3</td><td>支持 (alt-svc: h3=":443")</td></tr>
+<tr><td>业务 API 主机</td><td>edith.xiaohongshu.com</td></tr>
+<tr><td>反爬 API 主机</td><td>as.xiaohongshu.com</td></tr>
+<tr><td>APM 主机</td><td>apm-fe.xiaohongshu.com</td></tr>
+<tr><td>数据获取</td><td>REST API 为主, 部分 GraphQL (operationName/query:)</td></tr>
+</tbody>
+</table>
+
+<h3>I.4 反爬体系(三层架构)</h3>
+
+<h4>第一层: 脚本层 (JS 混淆)</h4>
+<pre><code>GET  as.xiaohongshu.com/api/sec/v1/ds?appId=xhs-pc-web
+     -&gt; 返回 obfuscator.io 风格混淆脚本 (59KB)
+     -&gt; 内含 _0x341b 字符串数组 + 重写 apply/call/bind/setPrototypeOf 防 hook
+     -&gt; getdss() 返回时间戳作为脚本版本(有效期)
+
+POST as.xiaohongshu.com/api/sec/v1/scripting
+     -&gt; 返回动态注入的 Robin() 函数(_ace_ 前缀变量)
+     -&gt; 内含 base64+UTF-8 解码器 -&gt; 运行时执行环境检测
+
+GET  fe-static.xhscdn.com/as/v2/ds/4c0bab9011f51d35ca6280649340e9b9.js
+     -&gt; v2 签名脚本(从 __INITIAL_STATE__.signConfig.url 拉取)</code></pre>
+
+<h4>第二层: 设备指纹 + 风控层</h4>
+<pre><code>POST /api/sec/v1/sbtsource -&gt; 返回完整反爬配置:
+  - 指纹采集脚本: fe-static.xhscdn.com/as/v2/fp/...js (v2 fingerprint)
+  - 上报 URL: /api/sec/v1/shield/webprofile
+  - token 生成: xhsTokenUrl (bf7d4e32...js)
+  - 签名脚本: signUrl (04b2948023...js)
+  - commonPatch: 需额外加密的 12 个 API endpoint(写入操作)
+
+POST /api/sec/v1/shield/webprofile -&gt; 上报指纹+风控数据
+GET  /api/redcaptcha/v2/getconfig -&gt; 验证码 SDK 配置</code></pre>
+
+<h4>第三层: 请求签名层</h4>
+<pre><code>每个 XHR 必带的签名头:
+  x-s:        XYS_xxx          (请求级签名,基于 URL/params/body)
+  x-s-common: 2UQAPsHC+aI...  (会话级公共签名,同一会话不变)
+  x-t:        1789308714xxx    (13 位毫秒时间戳)
+  x-b3-traceid:    16 hex     (Zipkin B3 分布式追踪)
+  x-xray-traceid: 32 hex      (自定义 APM 追踪)</code></pre>
+
+<h3>I.5 关键 API 端点实测清单</h3>
+<p>业务 API (edith.xiaohongshu.com):</p>
+<ul>
+  <li><code>/api/sns/web/v2/user/me</code> - 当前用户信息(未登录返回 -101)</li>
+  <li><code>/api/sns/web/v1/login/activate</code> - 未登录也下发匿名 session(user_id=6aa6af600000000013022405)</li>
+  <li><code>/api/sns/web/v1/config</code> - 站点配置(公开)</li>
+  <li><code>/api/sns/web/v1/system/config</code> - 系统配置(需登录)</li>
+  <li><code>/api/sns/web/v2/widgets</code> - 组件(需登录)</li>
+  <li><code>/api/sns/web/v2/comment/page?note_id=xxx</code> - 评论分页(未登录触发 HTTP 461 -&gt; 重定向 /website-login/error)</li>
+  <li><code>/api/sns/web/share/code</code> - 分享码</li>
+  <li><code>/api/sns/web/racing_get/racing_report</code> - 性能上报</li>
+  <li><code>/api/sns/web/v1/note/metrics_report</code> - 笔记埋点</li>
+  <li><code>/api/im/redmoji/version/detail</code> - 表情包</li>
+</ul>
+<p>反爬 API (as.xiaohongshu.com):</p>
+<ul>
+  <li><code>/api/sec/v1/ds</code> - 签名脚本本体</li>
+  <li><code>/api/sec/v1/scripting</code> - 动态注入混淆代码(Robin 函数)</li>
+  <li><code>/api/sec/v1/sbtsource</code> - 反爬配置(指纹脚本 URL + commonPatch API 清单)</li>
+  <li><code>/api/sec/v1/shield/webprofile</code> - 风控上报</li>
+  <li><code>/api/redcaptcha/v2/getconfig</code> - 验证码 SDK</li>
+</ul>
+
+<h3>I.6 访问控制机制</h3>
+<table>
+<thead><tr><th>场景</th><th>行为</th></tr></thead>
+<tbody>
+<tr><td>带 xsec_token 的 SSR HTML</td><td>HTTP 200, curl 能直接拿到, meta description 含真实笔记内容</td></tr>
+<tr><td>未登录访问 /api/sns/web/v2/comment/page</td><td>HTTP 461 + 重定向到 /website-login/error</td></tr>
+<tr><td>未登录访问 /api/sns/web/v2/user/me</td><td>HTTP 200 但 code:-101 "无登录信息"</td></tr>
+<tr><td>未登录访问 /api/sns/web/v1/login/activate</td><td>下发匿名 session(user_id, session, ssk, secure_session)</td></tr>
+<tr><td>access-control-allow-origin: 0</td><td>异常值(非 * 也非具体域名), 疑似反爬信号</td></tr>
+<tr><td>robots: noindex,nofollow,nosnippet</td><td>不让搜索引擎收录 explore 详情页</td></tr>
+</tbody>
+</table>
+
+<h3>I.7 性能监控</h3>
+<ul>
+  <li>APM: eaglet + insight + ApmXrayTracker 上报到 apm-fe.xiaohongshu.com/api/data</li>
+  <li>首屏: __FST__ 用 MutationObserver + PerformanceObserver 监控 FMP</li>
+  <li>资源重试: 失败资源写 localStorage, 切 CDN 重试</li>
+</ul>
+
+<h3>I.8 反爬破解要点(对接建议)</h3>
+<ol>
+  <li>xsec_token + xsec_source + source 三件套: URL 参数, 服务端校验, 过期则 422</li>
+  <li>x-s 签名: 基于请求 URL+params+body 用 ds 脚本生成, 每个请求不同</li>
+  <li>x-s-common 签名: 设备级, 会话内固定, 靠指纹采集脚本生成</li>
+  <li>匿名 session: 未登录也能拿 login/activate 给的 user_id(游客身份), 但权限受限</li>
+  <li>写操作需要二次加密: commonPatch 列表中的 12 个 API(评论/点赞/收藏/关注/feed 等)需额外的 token+签名</li>
+  <li>461 反爬触发: 未登录访问 comment API 直接触发风控</li>
+</ol>
+
+<h3>I.9 证据文件</h3>
+<ul>
+  <li><code>file:///workspace/xhs.html</code> - 原始 SSR HTML</li>
+  <li><code>file:///workspace/xhs_vendor.js</code> - vendor chunk (1.85MB)</li>
+  <li><code>file:///workspace/xhs_index.js</code> - index chunk (2.5MB)</li>
+  <li><code>file:///workspace/xhs_ds.js</code> - v1 反爬脚本 (59KB 混淆)</li>
+  <li><code>file:///workspace/xhs_runtime.log</code> - 运行时 XHR + 签名头完整日志</li>
+  <li><code>file:///workspace/xhs_response.log</code> - API 响应 body 完整日志</li>
+  <li><code>file:///workspace/xhs_1_landed.png</code> - 落地截图</li>
+</ul>
 
 <footer>
   <p>本文档由复盘生成。证据截图与脚本位于 <code>/workspace/</code>。</p>
